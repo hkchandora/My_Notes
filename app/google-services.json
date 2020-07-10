@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "333275488189",
+    "firebase_url": "https://notes-1d4d9.firebaseio.com",
+    "project_id": "notes-1d4d9",
+    "storage_bucket": "notes-1d4d9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333275488189:android:4a1050a93fbb2da639bcd4",
+        "android_client_info": {
+          "package_name": "com.himanshu.mynotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "333275488189-6b8n11f25cmbp7pmbk9hi37dbhajqdbu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtUNCQuUKnb4aV4yZzqXtClA5yqbJjF4E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "333275488189-6b8n11f25cmbp7pmbk9hi37dbhajqdbu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
