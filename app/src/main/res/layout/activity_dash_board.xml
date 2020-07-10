@@ -20,7 +20,7 @@
             android:layout_centerVertical="true"
             android:layout_marginStart="20dp"
             android:padding="2dp"
-            android:text="Hello Himanshu,\nGood morning"
+            android:text="Hello"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />

@@ -13,14 +13,17 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.Model.Notes;
 import com.himanshu.mynotes.ViewHolder.NoteViewHolder;
 
@@ -29,18 +32,13 @@ import java.util.Random;
 
 public class DashBoard extends AppCompatActivity {
 
-    private static final String TAG = "DashBoard";
     private static final int NUM_COLUMNS = 2;
-
-    private ArrayList<String> nTitle = new ArrayList<>();
-    private ArrayList<String> nDescription = new ArrayList<>();
-    private ArrayList<String> nDate = new ArrayList<>();
 
     private DatabaseReference reference;
     private FirebaseAuth auth;
 
     private RecyclerView recyclerView;
-
+private TextView CurrentUserName;
     private ProgressDialog loadBar;
 
     @Override
@@ -48,24 +46,69 @@ public class DashBoard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-//        InitNoteBitmaps();
-
 
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().child("Notes")
                 .child(auth.getCurrentUser().getUid());
 
+        CurrentUserName = findViewById(R.id.dashboard_name);
         recyclerView = findViewById(R.id.dashboard_recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         loadBar = new ProgressDialog(this);
-
-
         loadBar.show();
         loadBar.setContentView(R.layout.progress_dialog);
         loadBar.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         loadBar.setCanceledOnTouchOutside(false);
-        loadBar.dismiss();
+
+        CheckAnyNoteIsAvailable();
+
+        RetrieveCurrentUserInfo();
+
+        RecyclerViewShow();
+    }
+
+    public void CheckAnyNoteIsAvailable(){
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    loadBar.show();
+                    loadBar.setContentView(R.layout.progress_dialog);
+                    loadBar.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    loadBar.setCanceledOnTouchOutside(false);
+                } else {
+                    Toast.makeText(DashBoard.this, "No Notes Exists", Toast.LENGTH_SHORT).show();
+                    loadBar.dismiss();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    public void RetrieveCurrentUserInfo(){
+        FirebaseDatabase.getInstance().getReference().child("Users").child(auth.getCurrentUser().getUid())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                            CurrentUserName.setText("Hello "+snapshot.child("name").getValue().toString()+",\nGood morning");
+                            loadBar.dismiss();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    public void RecyclerViewShow(){
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
@@ -91,7 +134,7 @@ public class DashBoard extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 startActivity(new Intent(getApplicationContext(), EditNote.class)
-                                        .putExtra("type", "editText")
+                                        .putExtra("type", "editNote")
                                         .putExtra("nid", model.getNid()));
                             }
                         });
@@ -116,47 +159,10 @@ public class DashBoard extends AppCompatActivity {
         adapter.startListening();
     }
 
-//    public void InitNoteBitmaps() {
-//
-//        nTitle.add("Health");
-//        nDescription.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentume in libero sit amet dignissim");
-//        nDate.add("10 May 2020");
-//
-//        nTitle.add("Shop List");
-//        nDescription.add("1. vegetables\n2. Chilly\n3. Masala\n4. Chicken");
-//        nDate.add("10 June 2020");
-//
-//        nTitle.add("Food");
-//        nDescription.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentume in libero sit amet dignissim");
-//        nDate.add("25 May 2020");
-//
-//        nTitle.add("List");
-//        nDescription.add("1. vegetables\n2. Chilly\n3. Masala\n4. Chicken");
-//        nDate.add("10 June 2020");
-//
-//        nTitle.add("Health");
-//        nDescription.add("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec fermentume in libero sit amet dignissim");
-//        nDate.add("10 May 2020");
-//
-//        nTitle.add("Shop List");
-//        nDescription.add("1. vegetables\n2. Chilly\n3. Masala\n4. Chicken");
-//        nDate.add("10 June 2020");
-//
-//        InitRecyclerView();
-//    }
-//
-//    private void InitRecyclerView() {
-//        recyclerView = findViewById(R.id.dashboard_recyclerView);
-//        NoteRecyclerViewAdapter noteRecyclerViewAdapter = new NoteRecyclerViewAdapter(this, nTitle, nDescription, nDate);
-//
-//        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
-//        recyclerView.setLayoutManager(staggeredGridLayoutManager);
-//        recyclerView.setAdapter(noteRecyclerViewAdapter);
-//    }
-
     public void AddNoteButton(View view) {
-        startActivity(new Intent(getApplicationContext(), EditNote.class)
-                .putExtra("type", "addNote"));
+        Intent i = new Intent(getApplicationContext(), EditNote.class);
+        i.putExtra("type", "addNote");
+        startActivity(i);
     }
 
     public void LogOutAccount(View view) {
