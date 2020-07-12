@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.FirebaseDatabase;
-import com.himanshu.mynotes.Model.User;
+import com.himanshu.mynotes.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             progressBar.setVisibility(View.VISIBLE);
-            startActivity(new Intent(getApplicationContext(), DashBoard.class));
+            startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
             finish();
         }
     }
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
 
-                            Intent intent = new Intent(getApplicationContext(), DashBoard.class);
+                            Intent intent = new Intent(getApplicationContext(), DashBoardActivity.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(MainActivity.this, "Sorry auth failed.", Toast.LENGTH_SHORT).show();

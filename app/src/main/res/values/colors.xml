@@ -8,6 +8,8 @@
     <color name="brown">#9A9C9E</color>
     <color name="blue">#FF33B5E5</color>
 
+    <color name="gray_50">#FAFAFA</color>
+
 
     <item name="purple" type="color">#FFAA66CC</item>
     <item name="green" type="color">#FF99CC00</item>

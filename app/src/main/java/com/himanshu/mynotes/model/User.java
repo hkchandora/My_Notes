@@ -1,4 +1,4 @@
-package com.himanshu.mynotes.Model;
+package com.himanshu.mynotes.model;
 
 public class User {
     String uid, name, image, email;
