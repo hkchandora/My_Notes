@@ -78,4 +78,9 @@ public class DashBoard extends AppCompatActivity {
         startActivity(new Intent(getApplicationContext(), MainActivity.class));
         finish();
     }
+
+    private void fetchColors(){
+        // TODO(Fetch colors from db)
+    }
+
 }
