@@ -3,7 +3,6 @@ package com.himanshu.mynotes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -43,50 +42,34 @@ import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class DashBoardActivity extends AppCompatActivity {
 
     private static final int NUM_COLUMNS = 2;
-
     private DatabaseReference reference;
     private FirebaseAuth auth;
-    private ImageView ProfileImmage;
+    private ImageView ProfileImage;
     private RecyclerView recyclerView;
     private TextView CurrentUserName;
-    private ProgressDialog loadBar;
     private String currentTime = "";
-    private Notes notes;
     int currentColor = 0;
-    private  StaggeredGridLayoutManager staggeredGridLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
-        notes = new Notes();
-
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference()
                 .child(auth.getCurrentUser().getUid()).child("noteList");
 
         CurrentUserName = findViewById(R.id.dashboard_name);
-        ProfileImmage = findViewById(R.id.dashboard_profile_image);
+        ProfileImage = findViewById(R.id.dashboard_profile_image);
         recyclerView = findViewById(R.id.dashboard_recyclerView);
         recyclerView.setHasFixedSize(true);
-        staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-//
-//        loadBar = new ProgressDialog(this);
-//        loadBar.show();
-//        loadBar.setContentView(R.layout.progress_dialog);
-//        loadBar.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-//        loadBar.setCanceledOnTouchOutside(false);
 
         checkAnyNoteIsAvailable();
 
@@ -133,8 +116,7 @@ public class DashBoardActivity extends AppCompatActivity {
                         if (snapshot.exists()) {
                             CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
                             Picasso.with(DashBoardActivity.this).load(snapshot.child("photoUrl").getValue().toString())
-                                    .placeholder(R.drawable.profilemale).into(ProfileImmage);
-//                            loadBar.dismiss();
+                                    .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }
                     }
 
@@ -203,8 +185,6 @@ public class DashBoardActivity extends AppCompatActivity {
                         } else if (model.getIsPinned().equals("false")) {
                             holder.Pin.setVisibility(View.INVISIBLE);
                         }
-
-//                        loadBar.dismiss();
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override

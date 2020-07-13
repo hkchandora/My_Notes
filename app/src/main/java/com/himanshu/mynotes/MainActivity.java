@@ -29,16 +29,13 @@ import com.himanshu.mynotes.model.User;
 public class MainActivity extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
-    private RelativeLayout signInButton;
     private ProgressBar progressBar;
     private int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
-    private String TAG = "MainActivity";
 
     @Override
     protected void onStart() {
         super.onStart();
-
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             progressBar.setVisibility(View.VISIBLE);
@@ -53,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        signInButton = findViewById(R.id.sign_in_btn);
+        RelativeLayout signInButton = findViewById(R.id.sign_in_btn);
         progressBar = findViewById(R.id.progress_bar);
         mAuth = FirebaseAuth.getInstance();
 
@@ -79,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

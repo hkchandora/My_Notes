@@ -11,7 +11,6 @@
     <color name="gray_50">#FAFAFA</color>
     <color name="bg_blur">#987F8183</color>
 
-
     <item name="color_one" type="color">#FFCDD2</item>
     <item name="color_two" type="color">#E3F2FD</item>
     <item name="color_three" type="color">#EDE7F6</item>
@@ -20,15 +19,4 @@
     <item name="color_six" type="color">#FFE0B2</item>
     <item name="color_seven" type="color">#FFCCBC</item>
     <item name="color_eight" type="color">#90CAF9</item>
-
-    <integer-array name="androidColors">
-        <item>@color/color_one</item>
-        <item>@color/color_two</item>
-        <item>@color/color_three</item>
-        <item>@color/color_five</item>
-        <item>@color/color_four</item>
-        <item>@color/color_six</item>
-        <item>@color/color_seven</item>
-        <item>@color/color_eight</item>
-    </integer-array>
 </resources>

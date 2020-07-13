@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -60,7 +59,7 @@ public class EditNoteActivity extends AppCompatActivity {
         Title = findViewById(R.id.edit_note_title);
         Description = findViewById(R.id.edit_note_description);
         ToolBarTitle = findViewById(R.id.tool_bar_title);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        Toolbar toolbar =  findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 
         notes = new Notes();
@@ -153,6 +152,26 @@ public class EditNoteActivity extends AppCompatActivity {
             NoteTitle = Title.getText().toString();
             NoteDescription = Description.getText().toString();
 
+            RadioButton selectedRadioButton = null;
+            selectedRadioButton = findViewById(ColorPanelGroup.getCheckedRadioButtonId());
+            if (selectedRadioButton == One) {
+                NoteTileColor = "1";
+            } else if (selectedRadioButton == Two) {
+                NoteTileColor = "2";
+            } else if (selectedRadioButton == Three) {
+                NoteTileColor = "3";
+            } else if (selectedRadioButton == Four) {
+                NoteTileColor = "4";
+            } else if (selectedRadioButton == Five) {
+                NoteTileColor = "5";
+            } else if (selectedRadioButton == Six) {
+                NoteTileColor = "6";
+            } else if (selectedRadioButton == Seven) {
+                NoteTileColor = "7";
+            } else if (selectedRadioButton == Eight) {
+                NoteTileColor = "8";
+            }
+
 
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
@@ -167,12 +186,12 @@ public class EditNoteActivity extends AppCompatActivity {
                     snapshot.getRef().child("noteTitle").setValue(NoteTitle);
                     snapshot.getRef().child("noteDesc").setValue(NoteDescription);
                     snapshot.getRef().child("lastEditTime").setValue(editTime);
+                    snapshot.getRef().child("tileColor").setValue(NoteTileColor);
                     Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-
                 }
             });
             finish();
