@@ -106,11 +106,10 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             User model = new User();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            model.setUid(user.getUid());
                             model.setName(user.getDisplayName());
-                            model.setEmail(user.getEmail());
-                            model.setImage(user.getPhotoUrl().toString());
-                            FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).setValue(model);
+                            model.setEmailId(user.getEmail());
+                            model.setPhotoUrl(user.getPhotoUrl().toString());
+                            FirebaseDatabase.getInstance().getReference().child(user.getUid()).child("userDetails").setValue(model);
                             Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
 

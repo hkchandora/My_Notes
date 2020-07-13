@@ -25,15 +25,24 @@
             android:textStyle="bold"
             tools:text="@tools:sample/full_names" />
 
-        <de.hdodenhof.circleimageview.CircleImageView
+        <androidx.cardview.widget.CardView
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_marginEnd="20dp"
-            android:onClick="logOutAccount"
-            android:src="@drawable/profilemale" />
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp">
 
+            <ImageView
+                android:id="@+id/dashboard_profile_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:onClick="logOutAccount"
+                android:scaleType="fitCenter"
+                android:src="@drawable/profilemale"
+                tools:ignore="ContentDescription" />
+        </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
     <SearchView
@@ -81,8 +90,8 @@
         <de.hdodenhof.circleimageview.CircleImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:onClick="addNoteButton"
             android:layout_centerInParent="true"
+            android:onClick="addNoteButton"
             android:src="@drawable/ic_add_circle" />
 
         <ImageView

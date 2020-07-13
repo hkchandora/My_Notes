@@ -17,10 +17,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +39,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
+import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class DashBoardActivity extends AppCompatActivity {
@@ -47,26 +54,29 @@ public class DashBoardActivity extends AppCompatActivity {
 
     private DatabaseReference reference;
     private FirebaseAuth auth;
-
+    private ImageView ProfileImmage;
     private RecyclerView recyclerView;
     private TextView CurrentUserName;
     private ProgressDialog loadBar;
     private String currentTime = "";
+    private Notes notes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dash_board);
 
+        notes = new Notes();
 
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference().child("Notes")
-                .child(auth.getCurrentUser().getUid());
+        reference = FirebaseDatabase.getInstance().getReference()
+                .child(auth.getCurrentUser().getUid()).child("noteList");
 
         CurrentUserName = findViewById(R.id.dashboard_name);
+        ProfileImmage = findViewById(R.id.dashboard_profile_image);
         recyclerView = findViewById(R.id.dashboard_recyclerView);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
-        staggeredGridLayoutManager.setReverseLayout(true);
+//        staggeredGridLayoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 //
 //        loadBar = new ProgressDialog(this);
@@ -87,10 +97,6 @@ public class DashBoardActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-//                    loadBar.show();
-//                    loadBar.setContentView(R.layout.progress_dialog);
-//                    loadBar.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-//                    loadBar.setCanceledOnTouchOutside(false);
                     Toast.makeText(DashBoardActivity.this, "No Notes Exists", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -117,12 +123,14 @@ public class DashBoardActivity extends AppCompatActivity {
         }
 
         final String finalTime = currentTime;
-        FirebaseDatabase.getInstance().getReference().child("Users").child(auth.getCurrentUser().getUid())
+        FirebaseDatabase.getInstance().getReference().child(auth.getCurrentUser().getUid()).child("userDetails")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
+                            Picasso.with(DashBoardActivity.this).load(snapshot.child("photoUrl").getValue().toString())
+                                    .placeholder(R.drawable.profilemale).into(ProfileImmage);
 //                            loadBar.dismiss();
                         }
                     }
@@ -138,7 +146,7 @@ public class DashBoardActivity extends AppCompatActivity {
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
-                        .setQuery(reference.child("Note"), Notes.class)
+                        .setQuery(reference, Notes.class)
                         .build();
 
         final FirebaseRecyclerAdapter<Notes, NoteViewHolder> adapter =
@@ -150,14 +158,23 @@ public class DashBoardActivity extends AppCompatActivity {
                         final int currentColor = Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
                         holder.cardView.setCardBackgroundColor(currentColor);
 
-                        holder.Title.setText(model.getTitle());
-                        holder.Description.setText(model.getDescription());
-                        holder.Date.setText(model.getDate());
+                        holder.Description.setText(model.getNoteDesc());
+                        holder.Date.setText(model.getTimeOfCreation());
+
+                        if (model.getNoteTitle().equals("")) {
+                            holder.Title.setVisibility(View.INVISIBLE);
+                        } else if (!model.getNoteTitle().equals("")) {
+                            holder.Title.setVisibility(View.VISIBLE);
+                            holder.Title.setText(model.getNoteTitle());
+                        }
+
+                        if (model.getIsPinned().equals("true")) {
+                            holder.Pin.setVisibility(View.VISIBLE);
+                        } else if (model.getIsPinned().equals("false")) {
+                            holder.Pin.setVisibility(View.INVISIBLE);
+                        }
 
 //                        loadBar.dismiss();
-
-                        ViewCompat.setTransitionName(holder.Title, model.getTitle());
-
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -172,7 +189,10 @@ public class DashBoardActivity extends AppCompatActivity {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                popUpDialogForNote(model.getTitle(), model.getDescription(), model.getDate(), currentColor, model.getNid());
+
+                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                vibrator.vibrate(100);
+                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNid());
                                 return false;
                             }
                         });
@@ -193,8 +213,8 @@ public class DashBoardActivity extends AppCompatActivity {
         adapter.notifyItemInserted(1);
         adapter.notifyItemRemoved(1);
     }
-    
-    public void popUpDialogForNote(final String title, final String description, String date, int bgColor, final String nid){
+
+    public void popUpDialogForNote(final String title, final String description, String date, int bgColor, final String nid) {
 
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_long_press_note);
@@ -206,6 +226,7 @@ public class DashBoardActivity extends AppCompatActivity {
         Button DeleteBtn = dialog.findViewById(R.id.dialog_long_press_delete_btn);
         Button ArchiveBtn = dialog.findViewById(R.id.dialog_long_press_archive_btn);
         Button CopyBtn = dialog.findViewById(R.id.dialog_long_press_copy_btn);
+        Button PinBtn = dialog.findViewById(R.id.dialog_long_press_pin_btn);
         CardView cardView = dialog.findViewById(R.id.dialog_long_press_cardView);
 
         TitleTxt.setText(title);
@@ -216,14 +237,47 @@ public class DashBoardActivity extends AppCompatActivity {
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference deleteNoteReference = FirebaseDatabase.getInstance().getReference().child("Notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Note").child(nid);
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
 
-                deleteNoteReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                fromReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        dialog.dismiss();
-                        Toast.makeText(DashBoardActivity.this, "Note Deleted", Toast.LENGTH_SHORT).show();
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (Objects.requireNonNull(snapshot.child("isPinned").getValue()).equals("false")) {
+                            ValueEventListener valueEventListener = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isComplete()) {
+                                                fromReference.removeValue();
+                                                Toast.makeText(DashBoardActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                                dialog.dismiss();
+                                            } else {
+                                                Toast.makeText(DashBoardActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                                dialog.dismiss();
+                                            }
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                }
+                            };
+                            fromReference.addListenerForSingleValueEvent(valueEventListener);
+                        } else if (snapshot.child("isPinned").getValue().equals("true")) {
+                            dialog.dismiss();
+                            Toast.makeText(DashBoardActivity.this, "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
                 });
             }
@@ -232,12 +286,12 @@ public class DashBoardActivity extends AppCompatActivity {
         ArchiveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("Notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Note").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("Notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("Archive").child(nid);
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
 
-                ValueEventListener valueEventListener = new ValueEventListener()  {
+                ValueEventListener valueEventListener = new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -245,7 +299,7 @@ public class DashBoardActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isComplete()) {
                                     fromReference.removeValue();
-                                    Toast.makeText(DashBoardActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(DashBoardActivity.this, "Archived", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 } else {
                                     Toast.makeText(DashBoardActivity.this, "Failed", Toast.LENGTH_SHORT).show();
@@ -256,9 +310,9 @@ public class DashBoardActivity extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {}
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
                 };
-
                 fromReference.addListenerForSingleValueEvent(valueEventListener);
             }
         });
@@ -266,11 +320,40 @@ public class DashBoardActivity extends AppCompatActivity {
         CopyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = title+"\n"+description;
+                String text = title + "\n" + description;
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Note", text);
                 clipboard.setPrimaryClip(clip);
                 Toast.makeText(DashBoardActivity.this, "Note Copied", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+            }
+        });
+
+        PinBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+
+                pinReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            String checkPin = "";
+                            checkPin = snapshot.child("isPinned").getValue().toString();
+                            if (checkPin.equals("true")) {
+                                snapshot.getRef().child("isPinned").setValue("false");
+                            } else if (checkPin.equals("false")) {
+                                snapshot.getRef().child("isPinned").setValue("true");
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
                 dialog.dismiss();
             }
         });

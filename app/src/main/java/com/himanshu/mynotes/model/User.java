@@ -1,24 +1,15 @@
 package com.himanshu.mynotes.model;
 
 public class User {
-    String uid, name, image, email;
+    String name, photoUrl, emailId;
 
     public User() {
     }
 
-    public User(String uid, String name, String image, String email) {
-        this.uid = uid;
+    public User(String name, String photoUrl, String emailId) {
         this.name = name;
-        this.image = image;
-        this.email = email;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
+        this.photoUrl = photoUrl;
+        this.emailId = emailId;
     }
 
     public String getName() {
@@ -29,19 +20,19 @@ public class User {
         this.name = name;
     }
 
-    public String getImage() {
-        return image;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setImage(String image) {
-        this.image = image;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
-    public String getEmail() {
-        return email;
+    public String getEmailId() {
+        return emailId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmailId(String emailId) {
+        this.emailId = emailId;
     }
 }

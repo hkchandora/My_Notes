@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -32,6 +31,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private DatabaseReference reference;
     private String NoteTitle = "", NoteDescription = "";
     private Notes notes;
+    private TextView ToolBarTitle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,20 +40,15 @@ public class EditNoteActivity extends AppCompatActivity {
 
         Title = findViewById(R.id.edit_note_title);
         Description = findViewById(R.id.edit_note_description);
-
+        ToolBarTitle = findViewById(R.id.tool_bar_title);
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                BackPress();
-            }
-        });
 
         notes = new Notes();
 
-        reference = FirebaseDatabase.getInstance().getReference().child("Notes")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        reference = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("noteList");
 
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
@@ -63,26 +58,26 @@ public class EditNoteActivity extends AppCompatActivity {
 
         assert type != null;
         if (type.equals("editNote")) {
-            ForEditNoteActivity();
+            forEditNoteActivity();
         } else if (type.equals("addNote")) {
-            ForAddNoteActivity();
+            forAddNoteActivity();
         }
     }
 
-    public void ForEditNoteActivity() {
-        getSupportActionBar().setTitle("Edit Note");
+    public void forEditNoteActivity() {
+        ToolBarTitle.setText("EditText");
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             nid = getIntent().getExtras().getString("nid");
         }
 
-        reference.child("Note").child(nid).addValueEventListener(new ValueEventListener() {
+        reference.child(nid).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    NoteTitle = snapshot.child("title").getValue().toString();
-                    NoteDescription = snapshot.child("description").getValue().toString();
+                    NoteTitle = snapshot.child("noteTitle").getValue().toString();
+                    NoteDescription = snapshot.child("noteDesc").getValue().toString();
 
                     Title.setText(NoteTitle);
                     Description.setText(NoteDescription);
@@ -97,21 +92,33 @@ public class EditNoteActivity extends AppCompatActivity {
         });
     }
 
-    public void ForAddNoteActivity() {
-        getSupportActionBar().setTitle("Add Note");
+    public void forAddNoteActivity() {
+        ToolBarTitle.setText("Add Note");
     }
 
-    public void BackPress() {
+    public void backPress(View view) {
+        onBackPressed();
+    }
+
+    public void saveNoteInfo() {
         if (type.equals("editNote")) {
 
             NoteTitle = Title.getText().toString();
             NoteDescription = Description.getText().toString();
 
-            reference.child("Note").child(nid).addListenerForSingleValueEvent(new ValueEventListener() {
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
+            String saveCurrentDate = currentDate.format(calendar.getTime());
+            SimpleDateFormat currentTime = new SimpleDateFormat("HH:MM:SS a");
+            String saveCurrentTime = currentTime.format(calendar.getTime());
+            final String editTime = saveCurrentDate + " " + saveCurrentTime;
+
+            reference.child(nid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    snapshot.getRef().child("title").setValue(NoteTitle);
-                    snapshot.getRef().child("description").setValue(NoteDescription);
+                    snapshot.getRef().child("noteTitle").setValue(NoteTitle);
+                    snapshot.getRef().child("noteDesc").setValue(NoteDescription);
+                    snapshot.getRef().child("lastEditTime").setValue(editTime);
                     Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
                 }
 
@@ -121,8 +128,7 @@ public class EditNoteActivity extends AppCompatActivity {
                 }
             });
             finish();
-        }
-        else if (type.equals("addNote")) {
+        } else if (type.equals("addNote")) {
             String titleTxt = Title.getText().toString().trim();
             String descriptionTxt = Description.getText().toString().trim();
 
@@ -130,9 +136,11 @@ public class EditNoteActivity extends AppCompatActivity {
                 finish();
             } else if (TextUtils.isEmpty(descriptionTxt) && !TextUtils.isEmpty(titleTxt)) {
                 Description.setError("Required");
-            } else if (TextUtils.isEmpty(titleTxt) && !TextUtils.isEmpty(descriptionTxt)) {
-                Title.setError("Required");
-            } else {
+            }
+//            else if (TextUtils.isEmpty(titleTxt) && !TextUtils.isEmpty(descriptionTxt)) {
+//                Title.setError("Required");
+//            }
+            else {
 
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
@@ -142,11 +150,17 @@ public class EditNoteActivity extends AppCompatActivity {
                 String noteId = saveCurrentDate + " " + saveCurrentTime;
 
                 notes.setNid(noteId);
-                notes.setTitle(titleTxt);
-                notes.setDescription(descriptionTxt);
-                notes.setDate(saveCurrentDate);
-                notes.setUid(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
-                reference.child("Note").child(noteId).setValue(notes);
+                if (titleTxt.equals(null)) {
+                    notes.setNoteTitle("");
+                } else {
+                    notes.setNoteTitle(titleTxt);
+                }
+                notes.setNoteDesc(descriptionTxt);
+                notes.setTimeOfCreation(saveCurrentDate);
+                notes.setLastEditTime("");
+                notes.setIsPinned("false");
+                notes.setTileColor("");
+                reference.child(noteId).setValue(notes);
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 finish();
             }
@@ -156,6 +170,8 @@ public class EditNoteActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        saveNoteInfo();
     }
+
 }
 
