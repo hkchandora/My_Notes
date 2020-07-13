@@ -35,6 +35,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
@@ -60,6 +61,8 @@ public class DashBoardActivity extends AppCompatActivity {
     private ProgressDialog loadBar;
     private String currentTime = "";
     private Notes notes;
+    int currentColor = 0;
+    private  StaggeredGridLayoutManager staggeredGridLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +78,8 @@ public class DashBoardActivity extends AppCompatActivity {
         CurrentUserName = findViewById(R.id.dashboard_name);
         ProfileImmage = findViewById(R.id.dashboard_profile_image);
         recyclerView = findViewById(R.id.dashboard_recyclerView);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
-//        staggeredGridLayoutManager.setReverseLayout(true);
+        recyclerView.setHasFixedSize(true);
+        staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 //
 //        loadBar = new ProgressDialog(this);
@@ -144,9 +147,11 @@ public class DashBoardActivity extends AppCompatActivity {
 
     public void recyclerViewShow() {
 
+        Query query = reference;
+
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
-                        .setQuery(reference, Notes.class)
+                        .setQuery(query, Notes.class)
                         .build();
 
         final FirebaseRecyclerAdapter<Notes, NoteViewHolder> adapter =
@@ -154,13 +159,38 @@ public class DashBoardActivity extends AppCompatActivity {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
-                        Random random = new Random();
-                        final int currentColor = Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
-                        holder.cardView.setCardBackgroundColor(currentColor);
+                        String getColor = model.getTileColor();
+
+                        switch (getColor) {
+                            case "1":
+                                currentColor = R.color.color_one;
+                                break;
+                            case "2":
+                                currentColor = R.color.color_two;
+                                break;
+                            case "3":
+                                currentColor = R.color.color_three;
+                                break;
+                            case "4":
+                                currentColor = R.color.color_four;
+                                break;
+                            case "5":
+                                currentColor = R.color.color_five;
+                                break;
+                            case "6":
+                                currentColor = R.color.color_six;
+                                break;
+                            case "7":
+                                currentColor = R.color.color_seven;
+                                break;
+                            case "8":
+                                currentColor = R.color.color_eight;
+                                break;
+                        }
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
-
+                        holder.cardView.setCardBackgroundColor(getResources().getColor(currentColor));
                         if (model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.INVISIBLE);
                         } else if (!model.getNoteTitle().equals("")) {
