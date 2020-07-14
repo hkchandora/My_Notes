@@ -86,7 +86,7 @@
         android:id="@+id/edit_note_description"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/color_panel_layout"
+        android:layout_above="@+id/colors_rv"
         android:layout_below="@+id/edit_note_description_txt"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
@@ -102,99 +102,14 @@
         android:textColor="@color/black"
         android:textSize="14sp" />
 
-    <RelativeLayout
-        android:id="@+id/color_panel_layout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/colors_rv"
+        android:layout_margin="8dp"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        tools:listitem="@layout/layout_colors_list_item"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/white">
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        <TextView
-            android:id="@+id/color_panel_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:layout_centerHorizontal="true"
-            android:text="Select Note Background Color"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_below="@+id/color_panel_txt">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <RadioGroup
-                    android:id="@+id/color_panel_group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <RadioButton
-                        android:id="@+id/color_one_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_one" />
-
-                    <RadioButton
-                        android:id="@+id/color_two_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_two" />
-
-                    <RadioButton
-                        android:id="@+id/color_three_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_three" />
-
-                    <RadioButton
-                        android:id="@+id/color_four_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_four" />
-
-                    <RadioButton
-                        android:id="@+id/color_five_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_five" />
-
-                    <RadioButton
-                        android:id="@+id/color_six_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_six" />
-
-                    <RadioButton
-                        android:id="@+id/color_seven_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_seven" />
-
-                    <RadioButton
-                        android:id="@+id/color_eight_btn"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:background="@color/color_eight" />
-
-                </RadioGroup>
-            </LinearLayout>
-        </ScrollView>
-
-    </RelativeLayout>
 </RelativeLayout>

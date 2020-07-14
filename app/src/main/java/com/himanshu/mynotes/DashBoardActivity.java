@@ -17,6 +17,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,14 +38,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
+import com.himanshu.mynotes.listeners.OnFetchColorsListener;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 
 public class DashBoardActivity extends AppCompatActivity {
+
+    private static final String TAG = "DashBoardActivity";
 
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
@@ -76,6 +81,21 @@ public class DashBoardActivity extends AppCompatActivity {
         retrieveCurrentUserInfo();
 
         recyclerViewShow();
+        fetchColors();
+    }
+
+    private void fetchColors() {
+        FirebaseRepository.getInstance().fetchColors(new OnFetchColorsListener() {
+            @Override
+            public void onSuccess(List<String> colorsList) {
+                Utils.getInstance(DashBoardActivity.this).saveColorsList(colorsList);
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                Log.d(TAG, "onFailure: " + errorMessage);
+            }
+        });
     }
 
     public void checkAnyNoteIsAvailable() {
