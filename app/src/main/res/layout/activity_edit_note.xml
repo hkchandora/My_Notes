@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditNoteActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/tool_bar"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/gray_50"
+        android:elevation="6dp"
+        android:fitsSystemWindows="true"
+        android:theme="@style/Theme.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Light">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <Button
+                android:layout_width="30dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:background="@drawable/ic_back_arrow"
+                android:onClick="backPress" />
+
+            <TextView
+                android:id="@+id/tool_bar_title"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Title" />
+
+        </RelativeLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <TextView
+        android:id="@+id/edit_note_title_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tool_bar"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="Title"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edit_note_title"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@+id/edit_note_title_txt"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:background="@color/white"
+        android:hint="Title"
+        android:inputType="text"
+        android:paddingStart="10dp"
+        android:paddingEnd="5dp"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/edit_note_description_txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/edit_note_title"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="Description"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/edit_note_description"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/color_panel_layout"
+        android:layout_below="@+id/edit_note_description_txt"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="@color/white"
+        android:gravity="start"
+        android:hint="Type something.."
+        android:inputType="textMultiLine"
+        android:paddingStart="10dp"
+        android:paddingEnd="5dp"
+        android:textAlignment="gravity"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
+
+    <RelativeLayout
+        android:id="@+id/color_panel_layout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white">
+
+        <TextView
+            android:id="@+id/color_panel_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_centerHorizontal="true"
+            android:text="Select Note Background Color"
+            android:textColor="@color/black"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@+id/color_panel_txt">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <RadioGroup
+                    android:id="@+id/color_panel_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/color_one_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_one" />
+
+                    <RadioButton
+                        android:id="@+id/color_two_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_two" />
+
+                    <RadioButton
+                        android:id="@+id/color_three_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_three" />
+
+                    <RadioButton
+                        android:id="@+id/color_four_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_four" />
+
+                    <RadioButton
+                        android:id="@+id/color_five_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_five" />
+
+                    <RadioButton
+                        android:id="@+id/color_six_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_six" />
+
+                    <RadioButton
+                        android:id="@+id/color_seven_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_seven" />
+
+                    <RadioButton
+                        android:id="@+id/color_eight_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:background="@color/color_eight" />
+
+                </RadioGroup>
+            </LinearLayout>
+        </ScrollView>
+
+    </RelativeLayout>
+</RelativeLayout>

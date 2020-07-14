@@ -28,11 +28,11 @@ public class SplashScreen extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                        sleep(2000);
+                        sleep(500);
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
-                        startActivity(new Intent(getApplicationContext(), DashBoard.class));
+                        startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
                         finish();
                     }
                 }

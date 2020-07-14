@@ -24,25 +24,22 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.FirebaseDatabase;
-import com.himanshu.mynotes.Model.User;
+import com.himanshu.mynotes.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
     private GoogleSignInClient mGoogleSignInClient;
-    private RelativeLayout signInButton;
     private ProgressBar progressBar;
     private int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
-    private String TAG = "MainActivity";
 
     @Override
     protected void onStart() {
         super.onStart();
-
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             progressBar.setVisibility(View.VISIBLE);
-            startActivity(new Intent(getApplicationContext(), DashBoard.class));
+            startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
             finish();
         }
     }
@@ -53,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
-        signInButton = findViewById(R.id.sign_in_btn);
+        RelativeLayout signInButton = findViewById(R.id.sign_in_btn);
         progressBar = findViewById(R.id.progress_bar);
         mAuth = FirebaseAuth.getInstance();
 
@@ -80,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -106,15 +102,14 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             User model = new User();
                             FirebaseUser user = mAuth.getCurrentUser();
-                            model.setUid(user.getUid());
                             model.setName(user.getDisplayName());
-                            model.setEmail(user.getEmail());
-                            model.setImage(user.getPhotoUrl().toString());
-                            FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid()).setValue(model);
+                            model.setEmailId(user.getEmail());
+                            model.setPhotoUrl(user.getPhotoUrl().toString());
+                            FirebaseDatabase.getInstance().getReference().child(user.getUid()).child("userDetails").setValue(model);
                             Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
 
-                            Intent intent = new Intent(getApplicationContext(), DashBoard.class);
+                            Intent intent = new Intent(getApplicationContext(), DashBoardActivity.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(MainActivity.this, "Sorry auth failed.", Toast.LENGTH_SHORT).show();
