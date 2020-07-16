@@ -1,14 +1,25 @@
 package com.himanshu.mynotes.fragment;
 
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.himanshu.mynotes.EditProfileActivity;
 import com.himanshu.mynotes.R;
+import com.himanshu.mynotes.adapter.ProfileItemAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +27,13 @@ import com.himanshu.mynotes.R;
  * create an instance of this fragment.
  */
 public class ProfileFragment extends Fragment {
+
+    private TextView ProfileName, ProfileEmail;
+    private ImageView ProfileImage;
+    private Button EditProfileBtn;
+    private RecyclerView recyclerView;
+    private CardView ProfileCardView;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -60,7 +78,45 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        final View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        ProfileName = view.findViewById(R.id.profile_name);
+        ProfileEmail = view.findViewById(R.id.profile_email);
+        ProfileImage = view.findViewById(R.id.profile_image);
+        ProfileCardView = view.findViewById(R.id.profile_image_card_view);
+
+        String[] title = {"Pin","Archive","Delete"};
+        int[] image = {R.drawable.pin_icon,
+                R.drawable.archive_icon,
+                R.drawable.delete_icon};
+        recyclerView = view.findViewById(R.id.profile_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(new ProfileItemAdapter(getContext(), title, image));
+
+        EditProfileBtn = view.findViewById(R.id.profile_edit);
+        EditProfileBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent i = new Intent(getActivity(), EditProfileActivity.class);
+                Pair[] pairs = new Pair[3];
+                pairs[0] = new Pair<View, String>(ProfileCardView, "card_transition");
+                pairs[1] = new Pair<View, String>(ProfileName, "name_transition");
+                pairs[2] = new Pair<View, String>(EditProfileBtn, "title_transition");
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), pairs);
+                startActivity(i, options.toBundle());
+//                i.putExtra(EditProfileActivity.EXTRA_OBJECT, v);
+//                Pair<View, String> p1 = Pair.create((View)ProfileCardView, "card_transition");
+//                Pair<View, String> p2 = Pair.create((View)ProfileName, "name_transition");
+//                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p1, p2);
+//                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
+//                        ProfileCardView, ViewCompat.getTransitionName(ProfileCardView));
+//                startActivity(i, options.toBundle());
+            }
+        });
+        return view;
+
     }
 }

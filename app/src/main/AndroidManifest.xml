@@ -12,6 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".EditProfileActivity"></activity>
+        <activity android:name=".DeleteActivity" />
+        <activity android:name=".ArchiveActivity2" />
+        <activity android:name=".PinActivity" />
         <activity android:name=".MainDashBoardActivity" />
         <activity
             android:name=".EditNoteActivity"
