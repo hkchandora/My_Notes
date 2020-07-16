@@ -25,12 +25,13 @@ public class MainDashBoardActivity extends AppCompatActivity {
 
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
 
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, new DashBoardFragment()).commit();
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, new DashBoardFragment()).commit();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener bottomNavMethod = new
