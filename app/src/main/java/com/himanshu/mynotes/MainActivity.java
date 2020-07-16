@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
 
-                            Intent intent = new Intent(getApplicationContext(), DashBoardActivity.class);
+                            Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(MainActivity.this, "Sorry auth failed.", Toast.LENGTH_SHORT).show();

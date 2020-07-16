@@ -2,4 +2,6 @@
     <string name="app_name">My Notes</string>
     <string name="add_note">Add Note</string>
     <string name="edit_note">Edit Note</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
