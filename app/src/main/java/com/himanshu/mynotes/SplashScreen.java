@@ -32,7 +32,7 @@ public class SplashScreen extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
-                        startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+                        startActivity(new Intent(getApplicationContext(), MainDashBoardActivity.class));
                         finish();
                     }
                 }

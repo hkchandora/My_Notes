@@ -59,20 +59,13 @@
         android:id="@+id/dashboard_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/dashboard_view"
+        android:layout_above="@+id/relative_layout2"
         android:layout_below="@id/dashboard_search_bar"
         android:orientation="vertical"
         android:padding="5dp"
         app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
         app:spanCount="2"
         tools:listitem="@layout/item_note_grid" />
-
-    <View
-        android:id="@+id/dashboard_view"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_above="@id/relative_layout2"
-        android:background="@color/black" />
 
     <RelativeLayout
         android:id="@+id/relative_layout2"
