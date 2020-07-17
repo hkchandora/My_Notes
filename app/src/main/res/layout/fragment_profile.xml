@@ -39,7 +39,7 @@
             android:id="@+id/profile_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Himanshu Kumawat"
+            tools:text="Himanshu Kumawat"
             android:textColor="#000"
             android:transitionName="name_transition"
             android:textSize="22sp"
@@ -50,7 +50,7 @@
             android:id="@+id/profile_email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="chandorahimanshu@gmail.com"
+            tools:text="chandorahimanshu@gmail.com"
             android:textColor="#000"
             android:textSize="14sp" />
 

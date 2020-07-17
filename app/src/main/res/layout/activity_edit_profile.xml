@@ -25,6 +25,7 @@
                 android:layout_width="30dp"
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
+                android:onClick="EditProfileBackButton"
                 android:background="@drawable/ic_back_arrow" />
 
             <TextView
@@ -54,7 +55,7 @@
         app:cardElevation="0dp">
 
         <ImageView
-            android:id="@+id/profile_image"
+            android:id="@+id/edit_profile_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
@@ -75,12 +76,12 @@
         android:textStyle="bold" />
 
     <EditText
+        android:id="@+id/edit_profile_name"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/full_name_txt"
         android:layout_margin="10dp"
         android:transitionName="name_transition"
-        android:text="Himanshu Kumawat"
         android:padding="5dp"
         android:textStyle="bold"
         android:background="@color/white"

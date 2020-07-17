@@ -430,6 +430,5 @@ public class DashBoardFragment extends Fragment {
     public void logOutAccountBtn(View view) {
         FirebaseAuth.getInstance().signOut();
         startActivity(new Intent(getActivity(), MainActivity.class));
-        return;
     }
 }
