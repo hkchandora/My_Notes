@@ -4,6 +4,7 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,9 +18,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.EditProfileActivity;
 import com.himanshu.mynotes.R;
 import com.himanshu.mynotes.adapter.ProfileItemAdapter;
+import com.squareup.picasso.Picasso;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -116,7 +124,32 @@ public class ProfileFragment extends Fragment {
 //                startActivity(i, options.toBundle());
             }
         });
+
+
+        retrieveUserInfo();
+
         return view;
 
+    }
+
+    private void retrieveUserInfo() {
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("userDetails");
+
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ProfileName.setText(snapshot.child("name").getValue().toString());
+                ProfileEmail.setText(snapshot.child("emailId").getValue().toString());
+                Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
+                        .placeholder(R.drawable.profilemale).into(ProfileImage);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

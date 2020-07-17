@@ -24,6 +24,7 @@
                 android:id="@+id/note_item_pin"
                 android:layout_width="20dp"
                 android:layout_height="30dp"
+                android:visibility="invisible"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
                 android:src="@drawable/ic_pin" />

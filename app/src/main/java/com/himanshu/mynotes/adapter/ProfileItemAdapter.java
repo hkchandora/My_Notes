@@ -1,13 +1,17 @@
 package com.himanshu.mynotes.adapter;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityOptionsCompat;
@@ -51,15 +55,25 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
             public void onClick(View v) {
                 if (position == 0) {
                     Intent i = new Intent(context, PinActivity.class);
-                    ActivityOptionsCompat option = ActivityOptionsCompat.makeSceneTransitionAnimation((Activity) context,
-                            holder.ItemText, "title_transition");
-                    context.startActivity(i, option.toBundle());
+                    Pair[] pairs = new Pair[2];
+                    pairs[0] = new Pair<View, String>(holder.ItemText, "title_transition");
+                    pairs[1] = new Pair<View, String>(holder.ItemArrow, "arrow_transition");
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
+                    context.startActivity(i, options.toBundle());
                 } else if (position == 1) {
                     Intent i2 = new Intent(context, ArchiveActivity2.class);
-                    context.startActivity(i2);
+                    Pair[] pairs = new Pair[2];
+                    pairs[0] = new Pair<View, String>(holder.ItemText, "title_transition");
+                    pairs[1] = new Pair<View, String>(holder.ItemArrow, "arrow_transition");
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
+                    context.startActivity(i2, options.toBundle());
                 } else if (position == 2) {
                     Intent i3 = new Intent(context, DeleteActivity.class);
-                    context.startActivity(i3);
+                    Pair[] pairs = new Pair[2];
+                    pairs[0] = new Pair<View, String>(holder.ItemText, "title_transition");
+                    pairs[1] = new Pair<View, String>(holder.ItemArrow, "arrow_transition");
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
+                    context.startActivity(i3, options.toBundle());
                 }
             }
         });
@@ -74,11 +88,12 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
 
         ImageView ItemImage;
         TextView ItemText;
-
+        Button ItemArrow;
         public ProfileItemViewHolder(@NonNull View itemView) {
             super(itemView);
             ItemImage = itemView.findViewById(R.id.item_profile_icon);
             ItemText = itemView.findViewById(R.id.item_profile_title);
+            ItemArrow = itemView.findViewById(R.id.item_profile_arrow);
         }
     }
 }
