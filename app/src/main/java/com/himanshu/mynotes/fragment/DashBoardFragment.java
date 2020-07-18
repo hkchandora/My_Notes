@@ -1,21 +1,18 @@
-package com.himanshu.mynotes;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+package com.himanshu.mynotes.fragment;
 
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Vibrator;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,6 +33,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.himanshu.mynotes.AppsPrefs;
+import com.himanshu.mynotes.DashBoardActivity;
+import com.himanshu.mynotes.EditNoteActivity;
+import com.himanshu.mynotes.FirebaseRepository;
+import com.himanshu.mynotes.MainActivity;
+import com.himanshu.mynotes.R;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.listeners.OnFetchColorsListener;
 import com.himanshu.mynotes.model.NoteColor;
@@ -47,9 +50,14 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 
-public class DashBoardActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link DashBoardFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class DashBoardFragment extends Fragment {
 
-    private static final String TAG = "DashBoardActivity";
+    private static final String TAG = "DashBoardFragment";
 
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
@@ -60,27 +68,55 @@ public class DashBoardActivity extends AppCompatActivity {
     private String currentTime = "";
     int currentColor = 0;
 
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public DashBoardFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment DashBoardFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static DashBoardFragment newInstance(String param1, String param2) {
+        DashBoardFragment fragment = new DashBoardFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dash_board);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
 
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference()
                 .child(auth.getCurrentUser().getUid()).child("noteList");
 
-        CurrentUserName = findViewById(R.id.dashboard_name);
-        ProfileImage = findViewById(R.id.dashboard_profile_image);
-        recyclerView = findViewById(R.id.dashboard_recyclerView);
-        recyclerView.setHasFixedSize(true);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         checkAnyNoteIsAvailable();
 
         retrieveCurrentUserInfo();
 
-        recyclerViewShow();
+//        recyclerViewShow();
         fetchColors();
     }
 
@@ -88,7 +124,7 @@ public class DashBoardActivity extends AppCompatActivity {
         FirebaseRepository.getInstance().fetchColors(new OnFetchColorsListener() {
             @Override
             public void onSuccess(List<NoteColor> colorsList) {
-                AppsPrefs.getInstance(DashBoardActivity.this).saveColorsList(colorsList);
+                AppsPrefs.getInstance(requireActivity()).saveColorsList(colorsList);
             }
 
             @Override
@@ -98,12 +134,28 @@ public class DashBoardActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
+        CurrentUserName = (TextView) view.findViewById(R.id.dashboard_name);
+        ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
+        recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
+
+        recyclerView.setHasFixedSize(true);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        recyclerViewShow();
+        return view;
+    }
+
     public void checkAnyNoteIsAvailable() {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(DashBoardActivity.this, "No Notes Exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "No Notes Exists", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -135,7 +187,7 @@ public class DashBoardActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
-                            Picasso.with(DashBoardActivity.this).load(snapshot.child("photoUrl").getValue().toString())
+                            Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
                                     .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }
                     }
@@ -163,7 +215,7 @@ public class DashBoardActivity extends AppCompatActivity {
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
-                        holder.cardView.setCardBackgroundColor(getResources().getColor(currentColor));
+                        holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
                         if (model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.INVISIBLE);
                         } else if (!model.getNoteTitle().equals("")) {
@@ -171,16 +223,16 @@ public class DashBoardActivity extends AppCompatActivity {
                             holder.Title.setText(model.getNoteTitle());
                         }
 
-                        if (model.getIsPinned().equals("true")) {
+                        if (model.getIsPinned()) {
                             holder.Pin.setVisibility(View.VISIBLE);
-                        } else if (model.getIsPinned().equals("false")) {
+                        } else {
                             holder.Pin.setVisibility(View.INVISIBLE);
                         }
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(getApplicationContext(), EditNoteActivity.class);
+                                Intent intent = new Intent(requireActivity(), EditNoteActivity.class);
                                 intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
                                 intent.putExtra(EditNoteActivity.NOTE_DATA, model);
                                 startActivity(intent);
@@ -191,9 +243,10 @@ public class DashBoardActivity extends AppCompatActivity {
                             @Override
                             public boolean onLongClick(View v) {
 
-                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                                vibrator.vibrate(100);
+//                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//                                vibrator.vibrate(100);
                                 popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNoteId());
+
                                 return false;
                             }
                         });
@@ -211,13 +264,13 @@ public class DashBoardActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
         adapter.startListening();
-        adapter.notifyItemInserted(1);
-        adapter.notifyItemRemoved(1);
+//        adapter.notifyItemInserted(1);
+//        adapter.notifyItemRemoved(1);
     }
 
     public void popUpDialogForNote(final String title, final String description, String date, int bgColor, final String nid) {
 
-        final Dialog dialog = new Dialog(this);
+        final Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_long_press_note);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -233,7 +286,7 @@ public class DashBoardActivity extends AppCompatActivity {
         TitleTxt.setText(title);
         DescriptionTxt.setText(description);
         DateTxt.setText(date);
-        cardView.setCardBackgroundColor(bgColor);
+        cardView.setCardBackgroundColor(getResources().getColor(bgColor));
 
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -255,10 +308,10 @@ public class DashBoardActivity extends AppCompatActivity {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isComplete()) {
                                                 fromReference.removeValue();
-                                                Toast.makeText(DashBoardActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
                                                 dialog.dismiss();
                                             } else {
-                                                Toast.makeText(DashBoardActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
                                                 dialog.dismiss();
                                             }
                                         }
@@ -272,7 +325,7 @@ public class DashBoardActivity extends AppCompatActivity {
                             fromReference.addListenerForSingleValueEvent(valueEventListener);
                         } else if (snapshot.child("isPinned").getValue().equals("true")) {
                             dialog.dismiss();
-                            Toast.makeText(DashBoardActivity.this, "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -300,10 +353,10 @@ public class DashBoardActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isComplete()) {
                                     fromReference.removeValue();
-                                    Toast.makeText(DashBoardActivity.this, "Archived", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Archived", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 } else {
-                                    Toast.makeText(DashBoardActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
                             }
@@ -322,10 +375,10 @@ public class DashBoardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String text = title + "\n" + description;
-                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("Note", text);
-                clipboard.setPrimaryClip(clip);
-                Toast.makeText(DashBoardActivity.this, "Note Copied", Toast.LENGTH_SHORT).show();
+//                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//                ClipData clip = ClipData.newPlainText("Note", text);
+//                clipboard.setPrimaryClip(clip);
+                Toast.makeText(getActivity(), "Note Copied", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -361,16 +414,9 @@ public class DashBoardActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public void addNoteButton(View view) {
-        Intent i = new Intent(getApplicationContext(), EditNoteActivity.class);
-        i.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_CREATE_NOTE);
-        startActivity(i);
-    }
 
-    public void logOutAccount(View view) {
+    public void logOutAccountBtn(View view) {
         FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(getApplicationContext(), MainActivity.class));
-        finish();
+        startActivity(new Intent(getActivity(), MainActivity.class));
     }
-
 }
