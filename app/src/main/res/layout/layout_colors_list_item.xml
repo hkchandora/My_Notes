@@ -9,9 +9,24 @@
     <View
         android:id="@+id/view_color_list_item"
         android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginStart="4dp"
         android:layout_marginEnd="4dp"
-        android:layout_height="36dp"
         android:background="@drawable/dr_circular_bg_white" />
+
+    <View
+        android:id="@+id/bg_stroke"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/dr_round_stroke_bg_black" />
+
+    <ImageView
+        android:id="@+id/color_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_baseline_check_24" />
 
 </FrameLayout>

@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -39,6 +38,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.listeners.OnFetchColorsListener;
+import com.himanshu.mynotes.model.NoteColor;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 import com.squareup.picasso.Picasso;
@@ -87,8 +87,8 @@ public class DashBoardActivity extends AppCompatActivity {
     private void fetchColors() {
         FirebaseRepository.getInstance().fetchColors(new OnFetchColorsListener() {
             @Override
-            public void onSuccess(List<String> colorsList) {
-                Utils.getInstance(DashBoardActivity.this).saveColorsList(colorsList);
+            public void onSuccess(List<NoteColor> colorsList) {
+                AppsPrefs.getInstance(DashBoardActivity.this).saveColorsList(colorsList);
             }
 
             @Override
@@ -161,35 +161,6 @@ public class DashBoardActivity extends AppCompatActivity {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
-                        String getColor = model.getTileColor();
-
-                        switch (getColor) {
-                            case "1":
-                                currentColor = R.color.color_one;
-                                break;
-                            case "2":
-                                currentColor = R.color.color_two;
-                                break;
-                            case "3":
-                                currentColor = R.color.color_three;
-                                break;
-                            case "4":
-                                currentColor = R.color.color_four;
-                                break;
-                            case "5":
-                                currentColor = R.color.color_five;
-                                break;
-                            case "6":
-                                currentColor = R.color.color_six;
-                                break;
-                            case "7":
-                                currentColor = R.color.color_seven;
-                                break;
-                            case "8":
-                                currentColor = R.color.color_eight;
-                                break;
-                        }
-
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
                         holder.cardView.setCardBackgroundColor(getResources().getColor(currentColor));
@@ -210,8 +181,8 @@ public class DashBoardActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 Intent intent = new Intent(getApplicationContext(), EditNoteActivity.class);
-                                intent.putExtra("type", "editNote");
-                                intent.putExtra("nid", model.getNid());
+                                intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
+                                intent.putExtra(EditNoteActivity.NOTE_DATA, model);
                                 startActivity(intent);
                             }
                         });
@@ -222,7 +193,7 @@ public class DashBoardActivity extends AppCompatActivity {
 
                                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                                 vibrator.vibrate(100);
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNid());
+                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNoteId());
                                 return false;
                             }
                         });
@@ -392,7 +363,7 @@ public class DashBoardActivity extends AppCompatActivity {
 
     public void addNoteButton(View view) {
         Intent i = new Intent(getApplicationContext(), EditNoteActivity.class);
-        i.putExtra("type", "addNote");
+        i.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_CREATE_NOTE);
         startActivity(i);
     }
 

@@ -1,9 +1,6 @@
 package com.himanshu.mynotes.fragment;
 
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -16,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,16 +33,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.himanshu.mynotes.AppsPrefs;
 import com.himanshu.mynotes.DashBoardActivity;
 import com.himanshu.mynotes.EditNoteActivity;
+import com.himanshu.mynotes.FirebaseRepository;
 import com.himanshu.mynotes.MainActivity;
 import com.himanshu.mynotes.R;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
+import com.himanshu.mynotes.listeners.OnFetchColorsListener;
+import com.himanshu.mynotes.model.NoteColor;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -55,6 +57,7 @@ import java.util.Objects;
  */
 public class DashBoardFragment extends Fragment {
 
+    private static final String TAG = "DashBoardFragment";
 
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
@@ -114,7 +117,21 @@ public class DashBoardFragment extends Fragment {
         retrieveCurrentUserInfo();
 
 //        recyclerViewShow();
+        fetchColors();
+    }
 
+    private void fetchColors() {
+        FirebaseRepository.getInstance().fetchColors(new OnFetchColorsListener() {
+            @Override
+            public void onSuccess(List<NoteColor> colorsList) {
+                AppsPrefs.getInstance(requireActivity()).saveColorsList(colorsList);
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                Log.d(TAG, "onFailure: " + errorMessage);
+            }
+        });
     }
 
     @Override
@@ -196,38 +213,9 @@ public class DashBoardFragment extends Fragment {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
-                        String getColor = model.getTileColor();
-
-                        switch (getColor) {
-                            case "1":
-                                currentColor = R.color.color_one;
-                                break;
-                            case "2":
-                                currentColor = R.color.color_two;
-                                break;
-                            case "3":
-                                currentColor = R.color.color_three;
-                                break;
-                            case "4":
-                                currentColor = R.color.color_four;
-                                break;
-                            case "5":
-                                currentColor = R.color.color_five;
-                                break;
-                            case "6":
-                                currentColor = R.color.color_six;
-                                break;
-                            case "7":
-                                currentColor = R.color.color_seven;
-                                break;
-                            case "8":
-                                currentColor = R.color.color_eight;
-                                break;
-                        }
-
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
-                        holder.cardView.setCardBackgroundColor(getResources().getColor(currentColor));
+                        holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
                         if (model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.INVISIBLE);
                         } else if (!model.getNoteTitle().equals("")) {
@@ -235,18 +223,18 @@ public class DashBoardFragment extends Fragment {
                             holder.Title.setText(model.getNoteTitle());
                         }
 
-                        if (model.getIsPinned().equals("true")) {
+                        if (model.getIsPinned()) {
                             holder.Pin.setVisibility(View.VISIBLE);
-                        } else if (model.getIsPinned().equals("false")) {
+                        } else {
                             holder.Pin.setVisibility(View.INVISIBLE);
                         }
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(getActivity(), EditNoteActivity.class);
-                                intent.putExtra("type", "editNote");
-                                intent.putExtra("nid", model.getNid());
+                                Intent intent = new Intent(requireActivity(), EditNoteActivity.class);
+                                intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
+                                intent.putExtra(EditNoteActivity.NOTE_DATA, model);
                                 startActivity(intent);
                             }
                         });
@@ -257,7 +245,7 @@ public class DashBoardFragment extends Fragment {
 
 //                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 //                                vibrator.vibrate(100);
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNid());
+                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNoteId());
 
                                 return false;
                             }
@@ -276,13 +264,13 @@ public class DashBoardFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
         adapter.startListening();
-        adapter.notifyItemInserted(1);
-        adapter.notifyItemRemoved(1);
+//        adapter.notifyItemInserted(1);
+//        adapter.notifyItemRemoved(1);
     }
 
     public void popUpDialogForNote(final String title, final String description, String date, int bgColor, final String nid) {
 
-        final Dialog dialog = new Dialog(getActivity());
+        final Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_long_press_note);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 

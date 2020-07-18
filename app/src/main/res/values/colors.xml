@@ -10,6 +10,7 @@
     <color name="pin_color">#0726DF</color>
     <color name="gray_50">#FAFAFA</color>
     <color name="bg_blur">#987F8183</color>
+    <color name="gray_500">#9E9E9E</color>
 
     <item name="color_one" type="color">#FFCDD2</item>
     <item name="color_two" type="color">#E3F2FD</item>
