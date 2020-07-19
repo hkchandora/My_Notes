@@ -25,6 +25,7 @@
             tools:text="@tools:sample/full_names" />
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/dashboard_profile_image_card_view"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentEnd="true"
@@ -38,7 +39,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="fitCenter"
-                android:onClick="logOutAccountBtn"
                 android:src="@drawable/profilemale"
                 tools:ignore="ContentDescription" />
         </androidx.cardview.widget.CardView>

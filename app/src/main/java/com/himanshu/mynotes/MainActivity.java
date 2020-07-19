@@ -23,7 +23,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.model.User;
 
 public class MainActivity extends AppCompatActivity {
@@ -100,15 +103,29 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            User model = new User();
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            model.setName(user.getDisplayName());
-                            model.setEmailId(user.getEmail());
-                            model.setPhotoUrl(user.getPhotoUrl().toString());
-                            FirebaseDatabase.getInstance().getReference().child(user.getUid()).child("userDetails").setValue(model);
+
+                            final FirebaseUser user = mAuth.getCurrentUser();
+
+                            FirebaseDatabase.getInstance().getReference().child(user.getUid()).child("userDetails")
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (!snapshot.exists()) {
+                                                User model = new User();
+                                                model.setName(user.getDisplayName());
+                                                model.setEmailId(user.getEmail());
+                                                model.setPhotoUrl(user.getPhotoUrl().toString());
+                                                FirebaseDatabase.getInstance().getReference().child(user.getUid()).child("userDetails").setValue(model);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                             Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
-
                             Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
                             startActivity(intent);
                         } else {

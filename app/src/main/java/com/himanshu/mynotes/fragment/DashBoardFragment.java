@@ -116,8 +116,6 @@ public class DashBoardFragment extends Fragment {
         checkAnyNoteIsAvailable();
 
         retrieveCurrentUserInfo();
-
-//        recyclerViewShow();
         fetchColors();
     }
 
@@ -142,8 +140,16 @@ public class DashBoardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
         CurrentUserName = (TextView) view.findViewById(R.id.dashboard_name);
         ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
-        recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
+        ProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent i = new Intent(getActivity(), MainActivity.class);
+                startActivity(i);
+            }
+        });
 
+        recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
@@ -412,9 +418,4 @@ public class DashBoardFragment extends Fragment {
         dialog.show();
     }
 
-
-    public void logOutAccountBtn(View view) {
-        FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(getActivity(), MainActivity.class));
-    }
 }
