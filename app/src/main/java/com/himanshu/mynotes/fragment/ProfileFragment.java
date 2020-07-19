@@ -95,10 +95,11 @@ public class ProfileFragment extends Fragment {
         ProfileImage = view.findViewById(R.id.profile_image);
         ProfileCardView = view.findViewById(R.id.profile_image_card_view);
 
-        String[] title = {"Pin","Archive","Delete"};
+        String[] title = {"Pin","Archive","Delete", "About"};
         int[] image = {R.drawable.pin_icon,
                 R.drawable.archive_icon,
-                R.drawable.delete_icon};
+                R.drawable.delete_icon,
+                R.drawable.ic_about};
         recyclerView = view.findViewById(R.id.profile_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new ProfileItemAdapter(getContext(), title, image));
@@ -115,13 +116,6 @@ public class ProfileFragment extends Fragment {
                 pairs[2] = new Pair<View, String>(EditProfileBtn, "title_transition");
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), pairs);
                 startActivity(i, options.toBundle());
-//                i.putExtra(EditProfileActivity.EXTRA_OBJECT, v);
-//                Pair<View, String> p1 = Pair.create((View)ProfileCardView, "card_transition");
-//                Pair<View, String> p2 = Pair.create((View)ProfileName, "name_transition");
-//                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p1, p2);
-//                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
-//                        ProfileCardView, ViewCompat.getTransitionName(ProfileCardView));
-//                startActivity(i, options.toBundle());
             }
         });
 

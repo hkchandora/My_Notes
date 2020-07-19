@@ -218,7 +218,7 @@ public class DashBoardFragment extends Fragment {
                         holder.Date.setText(model.getTimeOfCreation());
                         holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
                         if (model.getNoteTitle().equals("")) {
-                            holder.Title.setVisibility(View.INVISIBLE);
+                            holder.Title.setVisibility(View.GONE);
                         } else if (!model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.VISIBLE);
                             holder.Title.setText(model.getNoteTitle());

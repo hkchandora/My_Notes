@@ -37,6 +37,11 @@ import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 public class DeleteActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
@@ -55,6 +60,9 @@ public class DeleteActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.delete_recyclerView);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
+
+        checkWhenNoteDeleted();
+
     }
 
     @Override
@@ -216,6 +224,35 @@ public class DeleteActivity extends AppCompatActivity {
     }
 
 
+    public void checkWhenNoteDeleted() {
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot dn : snapshot.getChildren()) {
+                        String storeDate = dn.child("timeOfCreation").getValue().toString();
+
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
+                        String CurrentDate = currentDate.format(calendar.getTime());
+                        Date date = new Date(CurrentDate);
+                        Date date2 = new Date(storeDate);
+                        long diff = date.getTime() - date2.getTime();
+
+                        if ((TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS))> 7) {
+                            dn.getRef().removeValue();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 
     public void DeleteBackButton(View view) {
         finish();
