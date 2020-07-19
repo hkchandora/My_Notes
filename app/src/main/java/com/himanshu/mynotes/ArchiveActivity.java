@@ -8,9 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -36,25 +33,21 @@ import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 
-import java.util.Objects;
-
-public class PinActivity extends AppCompatActivity {
+public class ArchiveActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
-    int currentColor = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pin);
-
+        setContentView(R.layout.activity_archive2);
 
         reference = FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList");
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes");
 
-        recyclerView = findViewById(R.id.pin_recyclerView);
+        recyclerView = findViewById(R.id.archive_recyclerView);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
     }
@@ -63,7 +56,7 @@ public class PinActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        Query query = reference.orderByChild("isPinned").equalTo(true);
+        Query query = reference;
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
@@ -88,7 +81,8 @@ public class PinActivity extends AppCompatActivity {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), model.getTileColor(), model.getNoteId());
+                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(),
+                                        model.getTileColor(), model.getNoteId());
                                 return false;
                             }
                         });
@@ -113,48 +107,90 @@ public class PinActivity extends AppCompatActivity {
     public void popUpDialogForNote(final String title, final String description, String date, String bgColor, final String nid) {
 
         final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.dialog_pin_note);
+        dialog.setContentView(R.layout.dialog_archive_note);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-        TextView TitleTxt = dialog.findViewById(R.id.dialog_pin_title);
-        TextView DescriptionTxt = dialog.findViewById(R.id.dialog_pin_description);
-        TextView DateTxt = dialog.findViewById(R.id.dialog_pin_date);
-        Button UnpinBtn = dialog.findViewById(R.id.dialog_unpin_btn);
-        CardView cardView = dialog.findViewById(R.id.dialog_pin_cardView);
+        TextView TitleTxt = dialog.findViewById(R.id.dialog_archive_title);
+        TextView DescriptionTxt = dialog.findViewById(R.id.dialog_archive_description);
+        TextView DateTxt = dialog.findViewById(R.id.dialog_archive_date);
+        Button DeleteBtn = dialog.findViewById(R.id.dialog_archive_delete_btn);
+        Button UnarchiveBtn = dialog.findViewById(R.id.dialog_archive_archive_btn);
+        CardView cardView = dialog.findViewById(R.id.dialog_archive_cardView);
 
         TitleTxt.setText(title);
         DescriptionTxt.setText(description);
         DateTxt.setText(date);
         cardView.setCardBackgroundColor(Color.parseColor(bgColor));
 
-        UnpinBtn.setOnClickListener(new View.OnClickListener() {
+        DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
+
+                ValueEventListener valueEventListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isComplete()) {
+                                    fromReference.removeValue();
+                                    Toast.makeText(ArchiveActivity.this, "Moved to bin", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(ArchiveActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                }
+                                dialog.dismiss();
+                            }
+                        });
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                };
+                fromReference.addListenerForSingleValueEvent(valueEventListener);
+            }
+        });
+
+        UnarchiveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
 
-                pinReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                ValueEventListener valueEventListener = new ValueEventListener() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()) {
-                            snapshot.getRef().child("isPinned").setValue(false);
-                            Toast.makeText(PinActivity.this, "Unpinned", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
-                        }
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isComplete()) {
+                                    fromReference.removeValue();
+                                    Toast.makeText(ArchiveActivity.this, "Unarchived", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(ArchiveActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                }
+                                dialog.dismiss();
+                            }
+                        });
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
+                    public void onCancelled(DatabaseError databaseError) {
                     }
-                });
+                };
+                fromReference.addListenerForSingleValueEvent(valueEventListener);
             }
         });
         dialog.show();
     }
 
 
-    public void PinBackButton(View view) {
+    public void ArchiveBackButton(View view) {
         finish();
     }
 }

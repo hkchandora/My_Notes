@@ -42,6 +42,7 @@ public class EditNoteActivity extends AppCompatActivity {
     private String NoteTitle = "", NoteDescription = "", NoteTileColor = "";
     private Notes noteModel;
     private TextView ToolBarTitle;
+    private String storeNewTileColor="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +100,7 @@ public class EditNoteActivity extends AppCompatActivity {
             recyclerView.setAdapter(adapter);
         }
 
-        if (noteModel.getTileColor() != null && !noteModel.getTileColor().isEmpty()){
+        if (noteModel.getTileColor() != null && !noteModel.getTileColor().isEmpty()) {
             changeColor(noteModel.getTileColor());
         }
 
@@ -142,13 +143,31 @@ public class EditNoteActivity extends AppCompatActivity {
             String saveCurrentTime = currentTime.format(calendar.getTime());
             final String editTime = saveCurrentDate + " " + saveCurrentTime;
 
+
+//            List<NoteColor> colors = AppsPrefs.getInstance(this).getColorsList();
+//            ColorListAdapter adapter = new ColorListAdapter(colors, listener);
+//            for (int i = 0; i < colors.size(); i++) {
+//                NoteColor color = colors.get(i);
+//                if (color.isSelected()) {
+//
+//                    int storeNewTileColor = color.getPosition();
+//
+//                    Toast.makeText(this, "position"+storeNewTileColor, Toast.LENGTH_SHORT).show();
+//
+//                    adapter.getItemId(i);
+////                    color.setSelected(true);
+////                    adapter.selectedColorPosition = i;
+//                    break;
+//                }
+//            }
+
             reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     snapshot.getRef().child("noteTitle").setValue(NoteTitle);
                     snapshot.getRef().child("noteDesc").setValue(NoteDescription);
                     snapshot.getRef().child("lastEditTime").setValue(editTime);
-                    snapshot.getRef().child("tileColor").setValue(NoteTileColor);
+//                    snapshot.getRef().child("tileColor").setValue(storeNewTileColor);
                     snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
                     Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
                 }
@@ -157,7 +176,8 @@ public class EditNoteActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError error) {
                 }
             });
-        } else if (type.equals(ACTION_CREATE_NOTE)) {
+        }
+        else if (type.equals(ACTION_CREATE_NOTE)) {
             String titleTxt = Title.getText().toString().trim();
             String descriptionTxt = Description.getText().toString().trim();
 
@@ -178,7 +198,7 @@ public class EditNoteActivity extends AppCompatActivity {
                 noteModel.setNoteId(noteId);
                 noteModel.setNoteDesc(descriptionTxt);
                 noteModel.setTimeOfCreation(saveCurrentDate);
-                noteModel.setLastEditTime(saveCurrentTime);
+                noteModel.setLastEditTime(saveCurrentDate);
                 noteModel.setIsPinned(false);
                 long timeStamp = System.currentTimeMillis();
                 noteModel.setCreatedTimeStamp(timeStamp);
@@ -201,6 +221,7 @@ public class EditNoteActivity extends AppCompatActivity {
         changeColor(color);
     };
 
+    //change background color of title and description
     private void changeColor(String color) {
         Title.setBackgroundColor(Color.parseColor(color));
         Description.setBackgroundColor(Color.parseColor(color));

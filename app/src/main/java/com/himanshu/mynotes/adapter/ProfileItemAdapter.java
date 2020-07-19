@@ -11,13 +11,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityOptionsCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.himanshu.mynotes.ArchiveActivity2;
+import com.himanshu.mynotes.ArchiveActivity;
 import com.himanshu.mynotes.DeleteActivity;
 import com.himanshu.mynotes.PinActivity;
 import com.himanshu.mynotes.R;
@@ -61,7 +59,7 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
                     context.startActivity(i, options.toBundle());
                 } else if (position == 1) {
-                    Intent i2 = new Intent(context, ArchiveActivity2.class);
+                    Intent i2 = new Intent(context, ArchiveActivity.class);
                     Pair[] pairs = new Pair[2];
                     pairs[0] = new Pair<View, String>(holder.ItemText, "title_transition");
                     pairs[1] = new Pair<View, String>(holder.ItemArrow, "arrow_transition");

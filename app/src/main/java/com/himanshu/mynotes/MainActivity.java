@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             progressBar.setVisibility(View.VISIBLE);
-            startActivity(new Intent(getApplicationContext(), DashBoardActivity.class));
+            startActivity(new Intent(getApplicationContext(), MainDashBoardActivity.class));
             finish();
         }
     }

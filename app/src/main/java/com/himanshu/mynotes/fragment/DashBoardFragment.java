@@ -1,6 +1,9 @@
 package com.himanshu.mynotes.fragment;
 
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -34,7 +37,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.AppsPrefs;
-import com.himanshu.mynotes.DashBoardActivity;
 import com.himanshu.mynotes.EditNoteActivity;
 import com.himanshu.mynotes.FirebaseRepository;
 import com.himanshu.mynotes.MainActivity;
@@ -48,7 +50,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -225,7 +226,7 @@ public class DashBoardFragment extends Fragment {
 
                         if (model.getIsPinned()) {
                             holder.Pin.setVisibility(View.VISIBLE);
-                        } else {
+                        } else if (!model.getIsPinned()) {
                             holder.Pin.setVisibility(View.INVISIBLE);
                         }
 
@@ -243,9 +244,7 @@ public class DashBoardFragment extends Fragment {
                             @Override
                             public boolean onLongClick(View v) {
 
-//                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                                vibrator.vibrate(100);
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNoteId());
+                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), model.getTileColor(), model.getNoteId());
 
                                 return false;
                             }
@@ -268,7 +267,7 @@ public class DashBoardFragment extends Fragment {
 //        adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(final String title, final String description, String date, int bgColor, final String nid) {
+    public void popUpDialogForNote(final String title, final String description, String date, String bgColor, final String nid) {
 
         final Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_long_press_note);
@@ -286,7 +285,7 @@ public class DashBoardFragment extends Fragment {
         TitleTxt.setText(title);
         DescriptionTxt.setText(description);
         DateTxt.setText(date);
-        cardView.setCardBackgroundColor(getResources().getColor(bgColor));
+        cardView.setCardBackgroundColor(Color.parseColor(bgColor));
 
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,7 +298,7 @@ public class DashBoardFragment extends Fragment {
                 fromReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (Objects.requireNonNull(snapshot.child("isPinned").getValue()).equals("false")) {
+                        if (snapshot.child("isPinned").getValue().equals(false)) {
                             ValueEventListener valueEventListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -309,11 +308,10 @@ public class DashBoardFragment extends Fragment {
                                             if (task.isComplete()) {
                                                 fromReference.removeValue();
                                                 Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
-                                                dialog.dismiss();
                                             } else {
                                                 Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
-                                                dialog.dismiss();
                                             }
+                                            dialog.dismiss();
                                         }
                                     });
                                 }
@@ -323,7 +321,7 @@ public class DashBoardFragment extends Fragment {
                                 }
                             };
                             fromReference.addListenerForSingleValueEvent(valueEventListener);
-                        } else if (snapshot.child("isPinned").getValue().equals("true")) {
+                        } else if (snapshot.child("isPinned").getValue().equals(true)) {
                             dialog.dismiss();
                             Toast.makeText(getActivity(), "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
                         }
@@ -375,9 +373,9 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String text = title + "\n" + description;
-//                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-//                ClipData clip = ClipData.newPlainText("Note", text);
-//                clipboard.setPrimaryClip(clip);
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Note", text);
+                clipboard.setPrimaryClip(clip);
                 Toast.makeText(getActivity(), "Note Copied", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
@@ -393,13 +391,14 @@ public class DashBoardFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            String checkPin = "";
-                            checkPin = snapshot.child("isPinned").getValue().toString();
-                            if (checkPin.equals("true")) {
-                                snapshot.getRef().child("isPinned").setValue("false");
-                            } else if (checkPin.equals("false")) {
-                                snapshot.getRef().child("isPinned").setValue("true");
+                            boolean checkPin;
+                            checkPin = (boolean) snapshot.child("isPinned").getValue();
+                            if (checkPin) {
+                                snapshot.getRef().child("isPinned").setValue(false);
+                            } else if (!checkPin) {
+                                snapshot.getRef().child("isPinned").setValue(true);
                             }
+                            dialog.dismiss();
                         }
                     }
 
@@ -408,7 +407,6 @@ public class DashBoardFragment extends Fragment {
 
                     }
                 });
-                dialog.dismiss();
             }
         });
         dialog.show();
