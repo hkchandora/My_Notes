@@ -39,10 +39,9 @@ public class EditNoteActivity extends AppCompatActivity {
     private String type = "";
     private EditText Title, Description;
     private DatabaseReference reference;
-    private String NoteTitle = "", NoteDescription = "", NoteTileColor = "";
+    private String NoteTitle = "", NoteDescription = "";
     private Notes noteModel;
     private TextView ToolBarTitle;
-    private String storeNewTileColor="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,31 +142,13 @@ public class EditNoteActivity extends AppCompatActivity {
             String saveCurrentTime = currentTime.format(calendar.getTime());
             final String editTime = saveCurrentDate + " " + saveCurrentTime;
 
-
-//            List<NoteColor> colors = AppsPrefs.getInstance(this).getColorsList();
-//            ColorListAdapter adapter = new ColorListAdapter(colors, listener);
-//            for (int i = 0; i < colors.size(); i++) {
-//                NoteColor color = colors.get(i);
-//                if (color.isSelected()) {
-//
-//                    int storeNewTileColor = color.getPosition();
-//
-//                    Toast.makeText(this, "position"+storeNewTileColor, Toast.LENGTH_SHORT).show();
-//
-//                    adapter.getItemId(i);
-////                    color.setSelected(true);
-////                    adapter.selectedColorPosition = i;
-//                    break;
-//                }
-//            }
-
             reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     snapshot.getRef().child("noteTitle").setValue(NoteTitle);
                     snapshot.getRef().child("noteDesc").setValue(NoteDescription);
                     snapshot.getRef().child("lastEditTime").setValue(editTime);
-//                    snapshot.getRef().child("tileColor").setValue(storeNewTileColor);
+                    snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
                     snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
                     Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
                 }
