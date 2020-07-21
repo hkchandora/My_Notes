@@ -67,6 +67,7 @@ public class DashBoardFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView CurrentUserName;
     private String currentTime = "";
+    private CardView addNoteCard;
     int currentColor = 0;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -109,12 +110,15 @@ public class DashBoardFragment extends Fragment {
         }
 
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference()
-                .child(auth.getCurrentUser().getUid()).child("noteList");
+        reference = FirebaseDatabase.getInstance().getReference().child("notes")
+                .child(auth.getCurrentUser().getUid());
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
         checkAnyNoteIsAvailable();
-
         retrieveCurrentUserInfo();
         fetchColors();
     }
@@ -138,15 +142,15 @@ public class DashBoardFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
+
+        addNoteCard = view.findViewById(R.id.add_new_note_card);
+
         CurrentUserName = (TextView) view.findViewById(R.id.dashboard_name);
         ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
-        ProfileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent i = new Intent(getActivity(), MainActivity.class);
-                startActivity(i);
-            }
+        ProfileImage.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent i = new Intent(getActivity(), MainActivity.class);
+            startActivity(i);
         });
 
         recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
@@ -158,11 +162,21 @@ public class DashBoardFragment extends Fragment {
     }
 
     public void checkAnyNoteIsAvailable() {
-        reference.addValueEventListener(new ValueEventListener() {
+        addNoteCard.setVisibility(View.GONE);
+        reference.child("noteList").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(getActivity(), "No Notes Exists", Toast.LENGTH_SHORT).show();
+
+                    addNoteCard.setVisibility(View.VISIBLE);
+                    addNoteCard.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent i = new Intent(getActivity(), EditNoteActivity.class);
+                            i.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_CREATE_NOTE);
+                            startActivity(i);
+                        }
+                    });
                 }
             }
 
@@ -187,8 +201,7 @@ public class DashBoardFragment extends Fragment {
             currentTime = "Good night";
         }
 
-        final String finalTime = currentTime;
-        FirebaseDatabase.getInstance().getReference().child(auth.getCurrentUser().getUid()).child("userDetails")
+        FirebaseDatabase.getInstance().getReference().child("userDetails").child(auth.getCurrentUser().getUid())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -206,9 +219,10 @@ public class DashBoardFragment extends Fragment {
                 });
     }
 
+
     public void recyclerViewShow() {
 
-        Query query = reference;
+        Query query = reference.child("noteList");
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
@@ -296,9 +310,9 @@ public class DashBoardFragment extends Fragment {
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
 
                 fromReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -344,9 +358,9 @@ public class DashBoardFragment extends Fragment {
         ArchiveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
 
                 ValueEventListener valueEventListener = new ValueEventListener() {
@@ -390,7 +404,7 @@ public class DashBoardFragment extends Fragment {
         PinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference()
+                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
 
                 pinReference.addListenerForSingleValueEvent(new ValueEventListener() {

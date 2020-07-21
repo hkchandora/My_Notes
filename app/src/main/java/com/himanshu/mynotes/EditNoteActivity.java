@@ -55,7 +55,7 @@ public class EditNoteActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 
-        reference = FirebaseDatabase.getInstance().getReference()
+        reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("noteList");
 
@@ -176,7 +176,7 @@ public class EditNoteActivity extends AppCompatActivity {
                 String noteId = saveCurrentDate + " " + saveCurrentTime;
 
                 noteModel.setNoteTitle(titleTxt);
-                noteModel.setNoteId(noteId);
+                noteModel.setNoteId(noteModel.getNoteId());
                 noteModel.setNoteDesc(descriptionTxt);
                 noteModel.setTimeOfCreation(saveCurrentDate);
                 noteModel.setLastEditTime(saveCurrentDate);
@@ -185,7 +185,7 @@ public class EditNoteActivity extends AppCompatActivity {
                 noteModel.setCreatedTimeStamp(timeStamp);
                 noteModel.setLastEditedTimeStamp(timeStamp);
 //                notes.setTileColor(selectedCardBgColor);TODO
-                reference.child(noteId).setValue(noteModel);
+                reference.child(noteModel.getNoteId()).setValue(noteModel);
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
             }
         }

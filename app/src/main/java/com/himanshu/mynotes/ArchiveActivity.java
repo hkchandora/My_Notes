@@ -44,7 +44,7 @@ public class ArchiveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive2);
 
-        reference = FirebaseDatabase.getInstance().getReference()
+        reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes");
 
         recyclerView = findViewById(R.id.archive_recyclerView);
@@ -125,9 +125,9 @@ public class ArchiveActivity extends AppCompatActivity {
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
 
                 ValueEventListener valueEventListener = new ValueEventListener() {
@@ -157,9 +157,9 @@ public class ArchiveActivity extends AppCompatActivity {
         UnarchiveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
 
                 ValueEventListener valueEventListener = new ValueEventListener() {

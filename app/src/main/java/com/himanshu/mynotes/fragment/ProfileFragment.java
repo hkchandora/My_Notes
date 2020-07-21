@@ -128,16 +128,18 @@ public class ProfileFragment extends Fragment {
 
     private void retrieveUserInfo() {
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("userDetails");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("userDetails")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                ProfileName.setText(snapshot.child("name").getValue().toString());
-                ProfileEmail.setText(snapshot.child("emailId").getValue().toString());
-                Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
-                        .placeholder(R.drawable.profilemale).into(ProfileImage);
+                if (snapshot.exists()) {
+                    ProfileName.setText(snapshot.child("name").getValue().toString());
+                    ProfileEmail.setText(snapshot.child("emailId").getValue().toString());
+                    Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
+                            .placeholder(R.drawable.profilemale).into(ProfileImage);
+                }
             }
 
             @Override

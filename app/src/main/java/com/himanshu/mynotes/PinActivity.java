@@ -51,7 +51,7 @@ public class PinActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pin);
 
 
-        reference = FirebaseDatabase.getInstance().getReference()
+        reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList");
 
         recyclerView = findViewById(R.id.pin_recyclerView);
@@ -88,7 +88,8 @@ public class PinActivity extends AppCompatActivity {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), model.getTileColor(), model.getNoteId());
+                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), model.getTileColor(),
+                                        model.getNoteId());
                                 return false;
                             }
                         });
@@ -130,7 +131,7 @@ public class PinActivity extends AppCompatActivity {
         UnpinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference()
+                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
 
                 pinReference.addListenerForSingleValueEvent(new ValueEventListener() {

@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
                             final FirebaseUser user = mAuth.getCurrentUser();
 
-                            FirebaseDatabase.getInstance().getReference().child(user.getUid()).child("userDetails")
+                            FirebaseDatabase.getInstance().getReference().child("userDetails").child(user.getUid())
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                                                 model.setName(user.getDisplayName());
                                                 model.setEmailId(user.getEmail());
                                                 model.setPhotoUrl(user.getPhotoUrl().toString());
-                                                FirebaseDatabase.getInstance().getReference().child(user.getUid()).child("userDetails").setValue(model);
+                                                FirebaseDatabase.getInstance().getReference().child("userDetails").child(user.getUid()).setValue(model);
                                             }
                                         }
 

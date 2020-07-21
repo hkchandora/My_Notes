@@ -54,7 +54,7 @@ public class DeleteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delete);
 
-        reference = FirebaseDatabase.getInstance().getReference()
+        reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes");
 
         recyclerView = findViewById(R.id.delete_recyclerView);
@@ -167,7 +167,7 @@ public class DeleteActivity extends AppCompatActivity {
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference deleteReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference deleteReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
 
                 deleteReference.removeValue();
@@ -191,9 +191,9 @@ public class DeleteActivity extends AppCompatActivity {
         RestoreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
 
                 ValueEventListener valueEventListener = new ValueEventListener() {
