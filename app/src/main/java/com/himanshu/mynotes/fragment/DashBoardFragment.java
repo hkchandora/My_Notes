@@ -167,7 +167,9 @@ public class DashBoardFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
+                            String name = snapshot.child("name").getValue().toString();
+
+                            CurrentUserName.setText("Hello " + name.substring(0, name.indexOf(' ')).trim() + " ,\n" + currentTime);
                             Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
                                     .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }

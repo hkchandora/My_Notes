@@ -15,9 +15,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.himanshu.mynotes.AboutActivity;
 import com.himanshu.mynotes.ArchiveActivity;
 import com.himanshu.mynotes.DeleteActivity;
+import com.himanshu.mynotes.MainActivity;
 import com.himanshu.mynotes.PinActivity;
 import com.himanshu.mynotes.R;
 
@@ -73,13 +75,17 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
                     pairs[1] = new Pair<View, String>(holder.ItemArrow, "arrow_transition");
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
                     context.startActivity(i3, options.toBundle());
-                } else if(position == 3){
+                } else if (position == 3) {
                     Intent i3 = new Intent(context, AboutActivity.class);
                     Pair[] pairs = new Pair[2];
                     pairs[0] = new Pair<View, String>(holder.ItemText, "title_transition");
                     pairs[1] = new Pair<View, String>(holder.ItemArrow, "arrow_transition");
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
                     context.startActivity(i3, options.toBundle());
+                } else if (position == 4) {
+                    FirebaseAuth.getInstance().signOut();
+                    Intent i4 = new Intent(context, MainActivity.class);
+                    context.startActivity(i4);
                 }
             }
         });
@@ -95,6 +101,7 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
         ImageView ItemImage;
         TextView ItemText;
         Button ItemArrow;
+
         public ProfileItemViewHolder(@NonNull View itemView) {
             super(itemView);
             ItemImage = itemView.findViewById(R.id.item_profile_icon);

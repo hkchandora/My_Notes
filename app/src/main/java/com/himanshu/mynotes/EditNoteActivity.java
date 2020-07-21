@@ -108,7 +108,7 @@ public class EditNoteActivity extends AppCompatActivity {
     }
 
     public void forEditNoteActivity() {
-        ToolBarTitle.setText("EditText");
+        ToolBarTitle.setText("Edit Note");
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
@@ -180,18 +180,12 @@ public class EditNoteActivity extends AppCompatActivity {
             String titleTxt = Title.getText().toString().trim();
             String descriptionTxt = Description.getText().toString().trim();
 
-            if (TextUtils.isEmpty(titleTxt) && TextUtils.isEmpty(descriptionTxt)) {
-                finish();
-            } else if (TextUtils.isEmpty(descriptionTxt) && !TextUtils.isEmpty(titleTxt)) {
-                Description.setError("Required");
-            } else {
+            if ((!TextUtils.isEmpty(descriptionTxt) && !TextUtils.isEmpty(titleTxt)) ||
+                    (!TextUtils.isEmpty(descriptionTxt)) && TextUtils.isEmpty(titleTxt)) {
 
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
                 String saveCurrentDate = currentDate.format(calendar.getTime());
-                SimpleDateFormat currentTime = new SimpleDateFormat("HH:MM:SS a");
-                String saveCurrentTime = currentTime.format(calendar.getTime());
-                String noteId = saveCurrentDate + " " + saveCurrentTime;
 
                 if (!titleTxt.isEmpty()) {
                     try {
@@ -218,7 +212,6 @@ public class EditNoteActivity extends AppCompatActivity {
                 long timeStamp = System.currentTimeMillis();
                 noteModel.setCreatedTimeStamp(timeStamp);
                 noteModel.setLastEditedTimeStamp(timeStamp);
-//                notes.setTileColor(selectedCardBgColor);TODO
                 reference.child(noteModel.getNoteId()).setValue(noteModel);
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
             }
