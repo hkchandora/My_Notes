@@ -10,6 +10,9 @@
     <color name="pin_color">#0726DF</color>
     <color name="gray_50">#FAFAFA</color>
     <color name="bg_blur">#987F8183</color>
+    <color name="grey_200">#EEEEEE</color>
+    <color name="grey_300">#E0E0E0</color>
+    <color name="grey_100">#F5F5F5</color>
     <color name="gray_500">#9E9E9E</color>
 
     <item name="color_one" type="color">#FFCDD2</item>
@@ -20,4 +23,6 @@
     <item name="color_six" type="color">#FFE0B2</item>
     <item name="color_seven" type="color">#FFCCBC</item>
     <item name="color_eight" type="color">#90CAF9</item>
+
+    <color name="transparent">#0fff</color>
 </resources>

@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="15dp"
             android:padding="2dp"
             android:textColor="@color/black"
             android:textSize="18sp"
@@ -44,23 +44,37 @@
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
-    <androidx.appcompat.widget.SearchView
+    <FrameLayout
         android:id="@+id/dashboard_search_bar"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
         android:layout_below="@+id/relative_layout"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="15dp"
         android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/brown_round" />
+        android:layout_marginEnd="15dp"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/intput_bg_dr"
+            android:focusable="false"
+            app:iconifiedByDefault="false"
+            app:queryBackground="@drawable/intput_bg_dr"
+            app:queryHint="Search here..." />
+
+    </FrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/dashboard_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/dashboard_search_bar"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
         android:orientation="vertical"
-        android:padding="5dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
         app:spanCount="2"
         tools:listitem="@layout/item_note_grid" />
@@ -70,10 +84,13 @@
         android:layout_width="200dp"
         android:layout_height="250dp"
         android:layout_below="@id/dashboard_search_bar"
-        android:layout_margin="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="15dp"
         android:visibility="gone"
+        tools:visibility="visible"
         android:minHeight="100dp"
-        app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="20dp"
         app:cardElevation="2dp">
 
@@ -86,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="30dp"
                 android:layout_marginEnd="50dp"
                 android:text="\+ Add new"
                 android:textAllCaps="false"
@@ -94,8 +111,10 @@
                 android:textSize="22sp" />
 
             <ImageView
-                android:layout_width="150dp"
-                android:layout_height="130dp"
+                android:id="@+id/iv_add_note"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:scaleType="centerCrop"
                 android:layout_margin="10dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"

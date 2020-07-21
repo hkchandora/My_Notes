@@ -51,11 +51,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Calendar;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DashBoardFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class DashBoardFragment extends Fragment {
 
     private static final String TAG = "DashBoardFragment";
@@ -68,47 +64,11 @@ public class DashBoardFragment extends Fragment {
     private TextView CurrentUserName;
     private String currentTime = "";
     private CardView addNoteCard;
-    int currentColor = 0;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public DashBoardFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DashBoardFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DashBoardFragment newInstance(String param1, String param2) {
-        DashBoardFragment fragment = new DashBoardFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(auth.getCurrentUser().getUid());
@@ -145,7 +105,7 @@ public class DashBoardFragment extends Fragment {
 
         addNoteCard = view.findViewById(R.id.add_new_note_card);
 
-        CurrentUserName = (TextView) view.findViewById(R.id.dashboard_name);
+        CurrentUserName = view.findViewById(R.id.dashboard_name);
         ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
         ProfileImage.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -207,7 +167,7 @@ public class DashBoardFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
-                            Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
+                            Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
                                     .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }
                     }
@@ -264,7 +224,7 @@ public class DashBoardFragment extends Fragment {
                             @Override
                             public boolean onLongClick(View v) {
 
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), model.getTileColor(), model.getNoteId());
+                                popUpDialogForNote(model);
 
                                 return false;
                             }
@@ -287,7 +247,7 @@ public class DashBoardFragment extends Fragment {
 //        adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(final String title, final String description, String date, String bgColor, final String nid) {
+    public void popUpDialogForNote(Notes note) {
 
         final Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_long_press_note);
@@ -296,55 +256,52 @@ public class DashBoardFragment extends Fragment {
         TextView TitleTxt = dialog.findViewById(R.id.dialog_long_press_title);
         TextView DescriptionTxt = dialog.findViewById(R.id.dialog_long_press_description);
         TextView DateTxt = dialog.findViewById(R.id.dialog_long_press_date);
-        Button DeleteBtn = dialog.findViewById(R.id.dialog_long_press_delete_btn);
-        Button ArchiveBtn = dialog.findViewById(R.id.dialog_long_press_archive_btn);
-        Button CopyBtn = dialog.findViewById(R.id.dialog_long_press_copy_btn);
-        Button PinBtn = dialog.findViewById(R.id.dialog_long_press_pin_btn);
+        ImageView DeleteBtn = dialog.findViewById(R.id.dialog_long_press_delete_btn);
+        ImageView ArchiveBtn = dialog.findViewById(R.id.dialog_long_press_archive_btn);
+        ImageView CopyBtn = dialog.findViewById(R.id.dialog_long_press_copy_btn);
+        ImageView PinBtn = dialog.findViewById(R.id.dialog_long_press_pin_btn);
         CardView cardView = dialog.findViewById(R.id.dialog_long_press_cardView);
 
-        TitleTxt.setText(title);
-        DescriptionTxt.setText(description);
-        DateTxt.setText(date);
-        cardView.setCardBackgroundColor(Color.parseColor(bgColor));
+        TitleTxt.setText(note.getNoteTitle());
+        DescriptionTxt.setText(note.getNoteDesc());
+        DateTxt.setText(note.getTimeOfCreation());
+        cardView.setCardBackgroundColor(Color.parseColor(note.getTileColor()));
 
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                note.setIsPinned(false);
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(note.getNoteId());
 
                 fromReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.child("isPinned").getValue().equals(false)) {
-                            ValueEventListener valueEventListener = new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isComplete()) {
-                                                fromReference.removeValue();
-                                                Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
-                                            } else {
-                                                Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
-                                            }
-                                            dialog.dismiss();
+                        ValueEventListener valueEventListener = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isComplete()) {
+                                            fromReference.removeValue();
+                                            Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
                                         }
-                                    });
-                                }
+                                        dialog.dismiss();
+                                    }
+                                });
+                            }
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                }
-                            };
-                            fromReference.addListenerForSingleValueEvent(valueEventListener);
-                        } else if (snapshot.child("isPinned").getValue().equals(true)) {
-                            dialog.dismiss();
-                            Toast.makeText(getActivity(), "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
-                        }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        };
+                        fromReference.addListenerForSingleValueEvent(valueEventListener);
+                        dialog.dismiss();
                     }
 
                     @Override
@@ -359,9 +316,9 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(note.getNoteId());
 
                 ValueEventListener valueEventListener = new ValueEventListener() {
                     @Override
@@ -392,7 +349,7 @@ public class DashBoardFragment extends Fragment {
         CopyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = title + "\n" + description;
+                String text = note.getNoteTitle() + "\n" + note.getNoteDesc();
                 ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("Note", text);
                 clipboard.setPrimaryClip(clip);
@@ -405,7 +362,7 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
 
                 pinReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -415,7 +372,7 @@ public class DashBoardFragment extends Fragment {
                             checkPin = (boolean) snapshot.child("isPinned").getValue();
                             if (checkPin) {
                                 snapshot.getRef().child("isPinned").setValue(false);
-                            } else if (!checkPin) {
+                            } else {
                                 snapshot.getRef().child("isPinned").setValue(true);
                             }
                             dialog.dismiss();
