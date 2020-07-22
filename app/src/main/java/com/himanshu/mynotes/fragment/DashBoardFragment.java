@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -65,7 +66,7 @@ public class DashBoardFragment extends Fragment {
     private TextView CurrentUserName;
     private String currentTime = "";
     private CardView addNoteCard;
-
+    private SearchView searchView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,7 +114,25 @@ public class DashBoardFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerViewShow();
+        recyclerViewShow("");
+
+        searchView = view.findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.toString()!=null){
+                    recyclerViewShow(newText.toString());
+                } else {
+                    recyclerViewShow("");
+                }
+                return false;
+            }
+        });
         return view;
     }
 
@@ -178,9 +197,9 @@ public class DashBoardFragment extends Fragment {
     }
 
 
-    public void recyclerViewShow() {
+    public void recyclerViewShow(String data) {
 
-        Query query = reference.child("noteList");
+        Query query = reference.child("noteList").orderByChild("noteDesc").startAt(data).endAt(data+"\uf8ff");
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
