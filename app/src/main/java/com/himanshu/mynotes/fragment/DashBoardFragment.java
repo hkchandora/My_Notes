@@ -147,13 +147,13 @@ public class DashBoardFragment extends Fragment {
         Calendar c = Calendar.getInstance();
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
 
-        if (timeOfDay >= 0 && timeOfDay < 12) {
+        if (timeOfDay >= 4 && timeOfDay < 12) {
             currentTime = "Good morning";
         } else if (timeOfDay >= 12 && timeOfDay < 16) {
             currentTime = "Good afternoon";
         } else if (timeOfDay >= 16 && timeOfDay < 21) {
             currentTime = "Good evening";
-        } else if (timeOfDay >= 21 && timeOfDay < 24) {
+        } else if ((timeOfDay >= 0 && timeOfDay < 4) || (timeOfDay >= 21 && timeOfDay < 24)) {
             currentTime = "Good night";
         }
 
