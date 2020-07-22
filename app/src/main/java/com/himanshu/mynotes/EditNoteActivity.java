@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.request.transition.NoTransition;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.listeners.OnNoteColorClickListener;
 import com.himanshu.mynotes.model.NoteColor;
 import com.himanshu.mynotes.model.Notes;
+import com.himanshu.mynotes.util.CryptoUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -142,6 +144,23 @@ public class EditNoteActivity extends AppCompatActivity {
             String saveCurrentTime = currentTime.format(calendar.getTime());
             final String editTime = saveCurrentDate + " " + saveCurrentTime;
 
+            if (!NoteTitle.isEmpty()) {
+                try {
+                    NoteTitle = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteTitle);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (!NoteDescription.isEmpty()) {
+                try {
+                    NoteDescription = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteDescription);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+
             reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -157,8 +176,7 @@ public class EditNoteActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError error) {
                 }
             });
-        }
-        else if (type.equals(ACTION_CREATE_NOTE)) {
+        } else if (type.equals(ACTION_CREATE_NOTE)) {
             String titleTxt = Title.getText().toString().trim();
             String descriptionTxt = Description.getText().toString().trim();
 
@@ -174,6 +192,22 @@ public class EditNoteActivity extends AppCompatActivity {
                 SimpleDateFormat currentTime = new SimpleDateFormat("HH:MM:SS a");
                 String saveCurrentTime = currentTime.format(calendar.getTime());
                 String noteId = saveCurrentDate + " " + saveCurrentTime;
+
+                if (!titleTxt.isEmpty()) {
+                    try {
+                        titleTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), titleTxt);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if (!descriptionTxt.isEmpty()) {
+                    try {
+                        descriptionTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), descriptionTxt);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 noteModel.setNoteTitle(titleTxt);
                 noteModel.setNoteId(noteModel.getNoteId());

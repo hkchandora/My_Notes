@@ -96,7 +96,7 @@
         android:gravity="start"
         android:padding="10dp"
         android:hint="Type something.."
-        android:inputType="textCapSentences"
+        android:inputType="textMultiLine"
         android:textAlignment="gravity"
         android:textColor="@color/black"
         android:textSize="14sp" />
