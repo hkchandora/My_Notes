@@ -108,11 +108,6 @@ public class DashBoardFragment extends Fragment {
 
         CurrentUserName = view.findViewById(R.id.dashboard_name);
         ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
-        ProfileImage.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(getActivity(), MainActivity.class);
-            startActivity(i);
-        });
 
         recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
         recyclerView.setHasFixedSize(true);

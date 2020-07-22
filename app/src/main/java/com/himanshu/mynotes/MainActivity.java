@@ -31,7 +31,7 @@ import com.himanshu.mynotes.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
-    private GoogleSignInClient mGoogleSignInClient;
+    public static GoogleSignInClient mGoogleSignInClient;
     private ProgressBar progressBar;
     private int RC_SIGN_IN = 1;
     private FirebaseAuth mAuth;
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Something went wrong!! try again", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -124,14 +124,18 @@ public class MainActivity extends AppCompatActivity {
 
                                         }
                                     });
-                            Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
                             Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
                             startActivity(intent);
                         } else {
-                            Toast.makeText(MainActivity.this, "Sorry auth failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "failed.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+    }
+
+    public void signOut(){
+        mGoogleSignInClient.signOut();
     }
 }
