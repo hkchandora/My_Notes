@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.himanshu.mynotes.fragment.DashBoardFragment;
@@ -48,8 +47,8 @@ public class MainDashBoardActivity extends AppCompatActivity {
                             getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
                             break;
                         case R.id.add_note:
-                            Intent i = new Intent(getApplicationContext(), EditNoteActivity.class);
-                            i.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_CREATE_NOTE);
+                            Intent i = new Intent(MainDashBoardActivity.this, EditNoteActivity.class);
+                            i.putExtra("type", "addNote");
                             startActivity(i);
                             break;
                         case R.id.profile:

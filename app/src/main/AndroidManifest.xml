@@ -12,15 +12,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AboutActivity"></activity>
-        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".EditProfileActivity"/>
         <activity android:name=".DeleteActivity" />
-        <activity android:name=".ArchiveActivity" />
+        <activity android:name=".ArchiveActivity2" />
         <activity android:name=".PinActivity" />
         <activity android:name=".MainDashBoardActivity" />
         <activity
             android:name=".EditNoteActivity"
             android:windowSoftInputMode="stateHidden" />
+        <activity android:name=".DashBoardActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".SplashScreen">
             <intent-filter>
@@ -29,9 +29,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/CropTheme" />
+
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/CropTheme"/>
     </application>
 
 </manifest>
