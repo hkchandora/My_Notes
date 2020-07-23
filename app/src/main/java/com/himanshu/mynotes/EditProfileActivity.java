@@ -50,8 +50,8 @@ public class EditProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_profile);
 
         storageProfileReference = FirebaseStorage.getInstance().getReference();
-        reference = FirebaseDatabase.getInstance().getReference().child("userDetails")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        reference = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("userDetails");
 
         ProfileImage = findViewById(R.id.edit_profile_image);
         NameTxt = findViewById(R.id.edit_profile_name);
@@ -101,13 +101,12 @@ public class EditProfileActivity extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    currentUserName = snapshot.child("name").getValue().toString();
-                    currentUserEmail = snapshot.child("emailId").getValue().toString();
-                    NameTxt.setText(currentUserName);
-                    Picasso.with(EditProfileActivity.this).load(snapshot.child("photoUrl").getValue().toString())
-                            .placeholder(R.drawable.profilemale).into(ProfileImage);
-                }
+
+                currentUserName = snapshot.child("name").getValue().toString();
+                currentUserEmail = snapshot.child("emailId").getValue().toString();
+                NameTxt.setText(snapshot.child("name").getValue().toString());
+                Picasso.with(EditProfileActivity.this).load(snapshot.child("photoUrl").getValue().toString())
+                        .placeholder(R.drawable.profilemale).into(ProfileImage);
             }
 
             @Override
@@ -124,8 +123,8 @@ public class EditProfileActivity extends AppCompatActivity {
         } else {
 
             if (ImageUri != null) {
-                final StorageReference fileRef = storageProfileReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid() +
-                        " (" + currentUserEmail + ")");
+                final StorageReference fileRef = storageProfileReference.child(currentUserName + " ("
+                        + currentUserEmail + ") " + FirebaseAuth.getInstance().getCurrentUser().getUid());
 
                 uploadTask = fileRef.putFile(ImageUri);
 

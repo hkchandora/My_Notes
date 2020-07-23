@@ -22,7 +22,7 @@ import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 
-public class PinActivity extends AppCompatActivity {
+public class ArchiveActivity2 extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private static final int NUM_COLUMNS = 2;
@@ -32,13 +32,12 @@ public class PinActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_pin);
-
+        setContentView(R.layout.activity_archive2);
 
         reference = FirebaseDatabase.getInstance().getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList");
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes");
 
-        recyclerView = findViewById(R.id.pin_recyclerView);
+        recyclerView = findViewById(R.id.archive_recyclerView);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
     }
@@ -47,7 +46,7 @@ public class PinActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        Query query = reference.orderByChild("isPinned").equalTo("true");
+        Query query = reference;
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
@@ -101,7 +100,7 @@ public class PinActivity extends AppCompatActivity {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                Toast.makeText(PinActivity.this, "Will implement later", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ArchiveActivity2.this, "Will implement later", Toast.LENGTH_SHORT).show();
                                 return false;
                             }
                         });
@@ -123,7 +122,7 @@ public class PinActivity extends AppCompatActivity {
         adapter.notifyItemRemoved(1);
     }
 
-    public void PinBackButton(View view) {
+    public void ArchiveBackButton(View view) {
         finish();
     }
 }

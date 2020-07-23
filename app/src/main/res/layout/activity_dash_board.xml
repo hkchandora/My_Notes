@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.DashBoardFragment">
+    android:background="@color/gray_50"
+    tools:context=".DashBoardActivity">
 
     <RelativeLayout
         android:id="@+id/relative_layout"
@@ -37,8 +38,8 @@
                 android:id="@+id/dashboard_profile_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:onClick="logOutAccount"
                 android:scaleType="fitCenter"
-                android:onClick="logOutAccountBtn"
                 android:src="@drawable/profilemale"
                 tools:ignore="ContentDescription" />
         </androidx.cardview.widget.CardView>
@@ -58,6 +59,7 @@
         android:id="@+id/dashboard_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/relative_layout2"
         android:layout_below="@id/dashboard_search_bar"
         android:orientation="vertical"
         android:padding="5dp"
@@ -65,5 +67,33 @@
         app:spanCount="2"
         tools:listitem="@layout/item_note_grid" />
 
+    <RelativeLayout
+        android:id="@+id/relative_layout2"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true">
 
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="30dp"
+            android:src="@drawable/dashboard_icon" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerInParent="true"
+            android:onClick="addNoteButton"
+            android:src="@drawable/ic_add_circle" />
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="30dp"
+            android:src="@drawable/user_profile_icon" />
+
+    </RelativeLayout>
 </RelativeLayout>

@@ -1,6 +1,14 @@
-package com.himanshu.mynotes.fragment;
+package com.himanshu.mynotes;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -8,14 +16,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
-
 import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,10 +36,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.himanshu.mynotes.DashBoardActivity;
-import com.himanshu.mynotes.EditNoteActivity;
-import com.himanshu.mynotes.MainActivity;
-import com.himanshu.mynotes.R;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
@@ -48,13 +44,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Calendar;
 import java.util.Objects;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DashBoardFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class DashBoardFragment extends Fragment {
-
+public class DashBoardActivity extends AppCompatActivity {
 
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
@@ -65,72 +55,27 @@ public class DashBoardFragment extends Fragment {
     private String currentTime = "";
     int currentColor = 0;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public DashBoardFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DashBoardFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DashBoardFragment newInstance(String param1, String param2) {
-        DashBoardFragment fragment = new DashBoardFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        setContentView(R.layout.activity_dash_board);
 
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference()
                 .child(auth.getCurrentUser().getUid()).child("noteList");
 
+        CurrentUserName = findViewById(R.id.dashboard_name);
+        ProfileImage = findViewById(R.id.dashboard_profile_image);
+        recyclerView = findViewById(R.id.dashboard_recyclerView);
+        recyclerView.setHasFixedSize(true);
+        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         checkAnyNoteIsAvailable();
 
         retrieveCurrentUserInfo();
 
-//        recyclerViewShow();
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
-        CurrentUserName = (TextView) view.findViewById(R.id.dashboard_name);
-        ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
-        recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
-
-        recyclerView.setHasFixedSize(true);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
         recyclerViewShow();
-        return view;
     }
 
     public void checkAnyNoteIsAvailable() {
@@ -138,7 +83,7 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(getActivity(), "No Notes Exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DashBoardActivity.this, "No Notes Exists", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -170,7 +115,7 @@ public class DashBoardFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
-                            Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
+                            Picasso.with(DashBoardActivity.this).load(snapshot.child("photoUrl").getValue().toString())
                                     .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }
                     }
@@ -244,7 +189,7 @@ public class DashBoardFragment extends Fragment {
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(getActivity(), EditNoteActivity.class);
+                                Intent intent = new Intent(getApplicationContext(), EditNoteActivity.class);
                                 intent.putExtra("type", "editNote");
                                 intent.putExtra("nid", model.getNid());
                                 startActivity(intent);
@@ -255,10 +200,9 @@ public class DashBoardFragment extends Fragment {
                             @Override
                             public boolean onLongClick(View v) {
 
-//                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                                vibrator.vibrate(100);
+                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                vibrator.vibrate(100);
                                 popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNid());
-
                                 return false;
                             }
                         });
@@ -282,7 +226,7 @@ public class DashBoardFragment extends Fragment {
 
     public void popUpDialogForNote(final String title, final String description, String date, int bgColor, final String nid) {
 
-        final Dialog dialog = new Dialog(getActivity());
+        final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_long_press_note);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
@@ -298,7 +242,7 @@ public class DashBoardFragment extends Fragment {
         TitleTxt.setText(title);
         DescriptionTxt.setText(description);
         DateTxt.setText(date);
-        cardView.setCardBackgroundColor(getResources().getColor(bgColor));
+        cardView.setCardBackgroundColor(bgColor);
 
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -320,10 +264,10 @@ public class DashBoardFragment extends Fragment {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isComplete()) {
                                                 fromReference.removeValue();
-                                                Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(DashBoardActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
                                                 dialog.dismiss();
                                             } else {
-                                                Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(DashBoardActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                                                 dialog.dismiss();
                                             }
                                         }
@@ -337,7 +281,7 @@ public class DashBoardFragment extends Fragment {
                             fromReference.addListenerForSingleValueEvent(valueEventListener);
                         } else if (snapshot.child("isPinned").getValue().equals("true")) {
                             dialog.dismiss();
-                            Toast.makeText(getActivity(), "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(DashBoardActivity.this, "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -365,10 +309,10 @@ public class DashBoardFragment extends Fragment {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isComplete()) {
                                     fromReference.removeValue();
-                                    Toast.makeText(getActivity(), "Archived", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(DashBoardActivity.this, "Archived", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 } else {
-                                    Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(DashBoardActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
                             }
@@ -387,10 +331,10 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String text = title + "\n" + description;
-//                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-//                ClipData clip = ClipData.newPlainText("Note", text);
-//                clipboard.setPrimaryClip(clip);
-                Toast.makeText(getActivity(), "Note Copied", Toast.LENGTH_SHORT).show();
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Note", text);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(DashBoardActivity.this, "Note Copied", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
@@ -426,9 +370,16 @@ public class DashBoardFragment extends Fragment {
         dialog.show();
     }
 
-
-    public void logOutAccountBtn(View view) {
-        FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(getActivity(), MainActivity.class));
+    public void addNoteButton(View view) {
+        Intent i = new Intent(getApplicationContext(), EditNoteActivity.class);
+        i.putExtra("type", "addNote");
+        startActivity(i);
     }
+
+    public void logOutAccount(View view) {
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+        finish();
+    }
+
 }
