@@ -19,21 +19,21 @@ public class CustomItemAnimation extends DefaultItemAnimator {
         return super.animateRemove(holder);
     }
 
-//    @Override
-//    public boolean animateAdd(RecyclerView.ViewHolder holder) {
-//        //This animation is for when new note create
-//        holder.itemView.setAnimation(AnimationUtils.loadAnimation(
-//                holder.itemView.getContext(),
-//                R.anim.add_note_anim
-//        ));
-//        return super.animateAdd(holder);
-//    }
+    @Override
+    public boolean animateAdd(RecyclerView.ViewHolder holder) {
+        //This animation is for when new note create
+        holder.itemView.setAnimation(AnimationUtils.loadAnimation(
+                holder.itemView.getContext(),
+                R.anim.add_note_anim
+        ));
+        return super.animateAdd(holder);
+    }
 
     //customize the duration
-//    @Override
-//    public long getAddDuration() {
-//        return 500;
-//    }
+    @Override
+    public long getAddDuration() {
+        return 500;
+    }
 
     @Override
     public long getRemoveDuration() {

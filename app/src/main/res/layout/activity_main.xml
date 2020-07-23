@@ -55,9 +55,8 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="60dp"
                 android:gravity="center"
-                android:layout_centerHorizontal="true"
                 android:text="Sign In with Google"
-                android:textAllCaps="false"
+                android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 android:textStyle="bold" />

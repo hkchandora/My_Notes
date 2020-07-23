@@ -95,13 +95,10 @@ public class ProfileFragment extends Fragment {
         ProfileImage = view.findViewById(R.id.profile_image);
         ProfileCardView = view.findViewById(R.id.profile_image_card_view);
 
-        String[] title = {"Pin", "Archive", "Delete", "About", "Log Out"};
-        int[] image = {
-                R.drawable.ic_pushpin,
+        String[] title = {"Pin","Archive","Delete"};
+        int[] image = {R.drawable.pin_icon,
                 R.drawable.archive_icon,
-                R.drawable.ic_delete,
-                R.drawable.ic_about,
-                R.drawable.logout};
+                R.drawable.delete_icon};
         recyclerView = view.findViewById(R.id.profile_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new ProfileItemAdapter(getContext(), title, image));
@@ -118,6 +115,13 @@ public class ProfileFragment extends Fragment {
                 pairs[2] = new Pair<View, String>(EditProfileBtn, "title_transition");
                 ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), pairs);
                 startActivity(i, options.toBundle());
+//                i.putExtra(EditProfileActivity.EXTRA_OBJECT, v);
+//                Pair<View, String> p1 = Pair.create((View)ProfileCardView, "card_transition");
+//                Pair<View, String> p2 = Pair.create((View)ProfileName, "name_transition");
+//                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), p1, p2);
+//                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
+//                        ProfileCardView, ViewCompat.getTransitionName(ProfileCardView));
+//                startActivity(i, options.toBundle());
             }
         });
 
@@ -130,18 +134,16 @@ public class ProfileFragment extends Fragment {
 
     private void retrieveUserInfo() {
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("userDetails")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("userDetails");
 
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    ProfileName.setText(snapshot.child("name").getValue().toString());
-                    ProfileEmail.setText(snapshot.child("emailId").getValue().toString());
-                    Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
-                            .placeholder(R.drawable.profilemale).into(ProfileImage);
-                }
+                ProfileName.setText(snapshot.child("name").getValue().toString());
+                ProfileEmail.setText(snapshot.child("emailId").getValue().toString());
+                Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
+                        .placeholder(R.drawable.profilemale).into(ProfileImage);
             }
 
             @Override

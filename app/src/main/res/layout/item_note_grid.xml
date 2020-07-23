@@ -12,31 +12,28 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="5dp"
         android:minHeight="100dp"
-        app:cardCornerRadius="10dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="2dp"
         tools:cardBackgroundColor="@color/colorAccent">
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="8dp">
+            android:layout_height="wrap_content">
 
             <ImageView
                 android:id="@+id/note_item_pin"
                 android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_height="30dp"
+                android:visibility="invisible"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:src="@drawable/ic_pushpin"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:src="@drawable/ic_pin" />
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:orientation="vertical"
             android:padding="10dp">
 
             <TextView
@@ -45,7 +42,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="22dp"
                 android:textColor="@color/black"
-                android:textSize="20sp"
+                android:textSize="22sp"
+                android:textStyle="bold"
                 tools:text="@tools:sample/full_names" />
 
             <TextView
@@ -53,7 +51,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_below="@+id/note_item_title"
                 android:ellipsize="end"
                 android:maxLines="7"
                 android:textColor="@color/black"
@@ -70,18 +67,6 @@
                 android:textSize="12sp"
                 tools:text="@tools:sample/date/ddmmyy" />
 
-            <TextView
-                android:id="@+id/note_item_deleted_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/note_item_description"
-                android:layout_marginTop="16dp"
-                android:textColor="@color/brown"
-                android:visibility="gone"
-                android:textSize="12sp"
-                tools:text="@tools:sample/date/ddmmyy" />
-
-
-        </RelativeLayout>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 </RelativeLayout>
