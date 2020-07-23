@@ -8,9 +8,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -82,8 +84,9 @@ public class ArchiveActivity extends AppCompatActivity {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(),
-                                        model.getTileColor(), model.getNoteId());
+                                Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                vb.vibrate(35);
+                                popUpDialogForNote(model);
                                 return false;
                             }
                         });
@@ -105,7 +108,7 @@ public class ArchiveActivity extends AppCompatActivity {
         adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(final String title, final String description, String date, String bgColor, final String nid) {
+    public void popUpDialogForNote(Notes model) {
 
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_archive_note);
@@ -118,18 +121,18 @@ public class ArchiveActivity extends AppCompatActivity {
         Button UnarchiveBtn = dialog.findViewById(R.id.dialog_archive_archive_btn);
         CardView cardView = dialog.findViewById(R.id.dialog_archive_cardView);
 
-        TitleTxt.setText(title);
-        DescriptionTxt.setText(description);
-        DateTxt.setText(date);
-        cardView.setCardBackgroundColor(Color.parseColor(bgColor));
+        TitleTxt.setText(model.getNoteTitle());
+        DescriptionTxt.setText(model.getNoteDesc());
+        DateTxt.setText(model.getTimeOfCreation());
+        cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
 
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(model.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(model.getNoteId());
 
                 ValueEventListener valueEventListener = new ValueEventListener() {
                     @Override
@@ -159,9 +162,9 @@ public class ArchiveActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(model.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(model.getNoteId());
 
                 ValueEventListener valueEventListener = new ValueEventListener() {
                     @Override

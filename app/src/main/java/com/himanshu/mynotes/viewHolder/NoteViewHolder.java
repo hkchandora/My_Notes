@@ -13,7 +13,7 @@ import com.himanshu.mynotes.R;
 
 public class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    public TextView Title, Description, Date;
+    public TextView Title, Description, Date, deletedDate;
     public CardView cardView;
     public ImageView Pin;
 
@@ -25,6 +25,7 @@ public class NoteViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         Date = itemView.findViewById(R.id.note_item_date);
         cardView = itemView.findViewById(R.id.note_item_cardView);
         Pin = itemView.findViewById(R.id.note_item_pin);
+        deletedDate = itemView.findViewById(R.id.note_item_deleted_date);
     }
 
     @Override

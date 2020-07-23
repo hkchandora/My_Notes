@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +51,7 @@ import com.himanshu.mynotes.util.CryptoUtil;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -183,7 +185,7 @@ public class DashBoardFragment extends Fragment {
                         if (snapshot.exists()) {
                             String name = snapshot.child("name").getValue().toString();
 
-                            CurrentUserName.setText("Hello " + name.substring(0, name.indexOf(' ')).trim() + " ,\n" + currentTime);
+                            CurrentUserName.setText("Hello " + name.substring(0, name.indexOf(' ')).trim() + ",\n" + currentTime);
                             Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
                                     .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }
@@ -258,7 +260,8 @@ public class DashBoardFragment extends Fragment {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-
+                                Vibrator vb = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                                vb.vibrate(35);
                                 popUpDialogForNote(model);
 
                                 return false;
@@ -306,6 +309,11 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 note.setIsPinned(false);
+
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
+                String deletedDate = currentDate.format(calendar.getTime());
+
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
@@ -323,6 +331,21 @@ public class DashBoardFragment extends Fragment {
                                         if (task.isComplete()) {
                                             fromReference.removeValue();
                                             Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
+
+                                            toReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()) {
+                                                        snapshot.child("deletedDate").getRef().setValue(deletedDate);
+                                                        snapshot.child("lastEditTime").getRef().removeValue();
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+
                                         } else {
                                             Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
                                         }

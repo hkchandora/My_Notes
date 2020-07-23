@@ -180,48 +180,47 @@ public class EditNoteActivity extends AppCompatActivity {
             String titleTxt = Title.getText().toString().trim();
             String descriptionTxt = Description.getText().toString().trim();
 
-            if ((!TextUtils.isEmpty(descriptionTxt) && !TextUtils.isEmpty(titleTxt)) ||
-                    (!TextUtils.isEmpty(descriptionTxt)) && TextUtils.isEmpty(titleTxt)) {
 
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
-                String saveCurrentDate = currentDate.format(calendar.getTime());
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
+            String saveCurrentDate = currentDate.format(calendar.getTime());
 
-                if (!titleTxt.isEmpty()) {
-                    try {
-                        titleTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), titleTxt);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            if (!titleTxt.isEmpty()) {
+                try {
+                    titleTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), titleTxt);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
-                if (!descriptionTxt.isEmpty()) {
-                    try {
-                        descriptionTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), descriptionTxt);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                noteModel.setNoteTitle(titleTxt);
-                noteModel.setNoteId(noteModel.getNoteId());
-                noteModel.setNoteDesc(descriptionTxt);
-                noteModel.setTimeOfCreation(saveCurrentDate);
-                noteModel.setLastEditTime(saveCurrentDate);
-                noteModel.setIsPinned(false);
-                long timeStamp = System.currentTimeMillis();
-                noteModel.setCreatedTimeStamp(timeStamp);
-                noteModel.setLastEditedTimeStamp(timeStamp);
-                reference.child(noteModel.getNoteId()).setValue(noteModel);
-                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
             }
+
+            if (!descriptionTxt.isEmpty()) {
+                try {
+                    descriptionTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), descriptionTxt);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            noteModel.setNoteTitle(titleTxt);
+            noteModel.setNoteId(noteModel.getNoteId());
+            noteModel.setNoteDesc(descriptionTxt);
+            noteModel.setTimeOfCreation(saveCurrentDate);
+            noteModel.setLastEditTime(saveCurrentDate);
+            noteModel.setIsPinned(false);
+            long timeStamp = System.currentTimeMillis();
+            noteModel.setCreatedTimeStamp(timeStamp);
+            noteModel.setLastEditedTimeStamp(timeStamp);
+            reference.child(noteModel.getNoteId()).setValue(noteModel);
+            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+            finish();
+        } else {
+            finish();
         }
     }
 
     @Override
     public void onBackPressed() {
         saveNoteInfo();
-        super.onBackPressed();
     }
 
     private OnNoteColorClickListener listener = color -> {

@@ -14,6 +14,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +45,6 @@ public class PinActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
-    int currentColor = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +89,9 @@ public class PinActivity extends AppCompatActivity {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), model.getTileColor(),
-                                        model.getNoteId());
+                                Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                vb.vibrate(35);
+                                popUpDialogForNote(model);
                                 return false;
                             }
                         });
@@ -112,7 +113,7 @@ public class PinActivity extends AppCompatActivity {
         adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(final String title, final String description, String date, String bgColor, final String nid) {
+    public void popUpDialogForNote(Notes model) {
 
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_pin_note);
@@ -124,16 +125,16 @@ public class PinActivity extends AppCompatActivity {
         Button UnpinBtn = dialog.findViewById(R.id.dialog_unpin_btn);
         CardView cardView = dialog.findViewById(R.id.dialog_pin_cardView);
 
-        TitleTxt.setText(title);
-        DescriptionTxt.setText(description);
-        DateTxt.setText(date);
-        cardView.setCardBackgroundColor(Color.parseColor(bgColor));
+        TitleTxt.setText(model.getNoteTitle());
+        DescriptionTxt.setText(model.getNoteDesc());
+        DateTxt.setText(model.getTimeOfCreation());
+        cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
 
         UnpinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(model.getNoteId());
 
                 pinReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
