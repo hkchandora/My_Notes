@@ -13,6 +13,8 @@ public class Notes implements Parcelable {
     private String timeOfCreation;
     private String lastEditTime;
     private String tileColor;
+    private String deletedDate;
+    private String deletedFrom;
     private boolean isPinned;
     private long createdTimeStamp;
     private long lastEditedTimeStamp;
@@ -26,7 +28,9 @@ public class Notes implements Parcelable {
         noteDesc = in.readString();
         timeOfCreation = in.readString();
         lastEditTime = in.readString();
+        deletedDate = in.readString();
         tileColor = in.readString();
+        deletedFrom = in.readString();
         isPinned = in.readByte() != 0;
         createdTimeStamp = in.readLong();
         lastEditedTimeStamp = in.readLong();
@@ -108,12 +112,28 @@ public class Notes implements Parcelable {
         this.createdTimeStamp = createdTimeStamp;
     }
 
+    public String getDeletedFrom() {
+        return deletedFrom;
+    }
+
+    public void setDeletedFrom(String deletedFrom) {
+        this.deletedFrom = deletedFrom;
+    }
+
     public long getLastEditedTimeStamp() {
         return lastEditedTimeStamp;
     }
 
     public void setLastEditedTimeStamp(long lastEditedTimeStamp) {
         this.lastEditedTimeStamp = lastEditedTimeStamp;
+    }
+
+    public String getDeletedDate() {
+        return deletedDate;
+    }
+
+    public void setDeletedDate(String deletedDate) {
+        this.deletedDate = deletedDate;
     }
 
     @NonNull

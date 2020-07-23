@@ -14,7 +14,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -34,6 +36,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
+import com.himanshu.mynotes.util.CryptoUtil;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 
 import java.util.Objects;
@@ -43,7 +46,6 @@ public class PinActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
-    int currentColor = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +59,12 @@ public class PinActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.pin_recyclerView);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
+
+        recyclerViewShow();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+
+    public void recyclerViewShow(){
 
         Query query = reference.orderByChild("isPinned").equalTo(true);
 
@@ -74,6 +77,24 @@ public class PinActivity extends AppCompatActivity {
                 new FirebaseRecyclerAdapter<Notes, NoteViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
+
+                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+                                model.setNoteTitle(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+                                model.setNoteDesc(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
@@ -88,8 +109,9 @@ public class PinActivity extends AppCompatActivity {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), model.getTileColor(),
-                                        model.getNoteId());
+                                Vibrator vb = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                                vb.vibrate(35);
+                                popUpDialogForNote(model);
                                 return false;
                             }
                         });
@@ -111,7 +133,7 @@ public class PinActivity extends AppCompatActivity {
         adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(final String title, final String description, String date, String bgColor, final String nid) {
+    public void popUpDialogForNote(Notes model) {
 
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_pin_note);
@@ -123,16 +145,17 @@ public class PinActivity extends AppCompatActivity {
         Button UnpinBtn = dialog.findViewById(R.id.dialog_unpin_btn);
         CardView cardView = dialog.findViewById(R.id.dialog_pin_cardView);
 
-        TitleTxt.setText(title);
-        DescriptionTxt.setText(description);
-        DateTxt.setText(date);
-        cardView.setCardBackgroundColor(Color.parseColor(bgColor));
+        TitleTxt.setText(model.getNoteTitle());
+        DescriptionTxt.setText(model.getNoteDesc());
+        DateTxt.setText(model.getTimeOfCreation());
+        cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
 
         UnpinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(model.getNoteId());
 
                 pinReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -140,7 +163,6 @@ public class PinActivity extends AppCompatActivity {
                         if (snapshot.exists()) {
                             snapshot.getRef().child("isPinned").setValue(false);
                             Toast.makeText(PinActivity.this, "Unpinned", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
                         }
                     }
 
@@ -156,6 +178,22 @@ public class PinActivity extends AppCompatActivity {
 
 
     public void PinBackButton(View view) {
-        finish();
+        onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        supportFinishAfterTransition();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                supportFinishAfterTransition();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

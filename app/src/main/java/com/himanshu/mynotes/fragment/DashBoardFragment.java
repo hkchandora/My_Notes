@@ -10,12 +10,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +51,7 @@ import com.himanshu.mynotes.util.CryptoUtil;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -65,7 +68,7 @@ public class DashBoardFragment extends Fragment {
     private TextView CurrentUserName;
     private String currentTime = "";
     private CardView addNoteCard;
-
+    private SearchView searchView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,17 +111,30 @@ public class DashBoardFragment extends Fragment {
 
         CurrentUserName = view.findViewById(R.id.dashboard_name);
         ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
-        ProfileImage.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent i = new Intent(getActivity(), MainActivity.class);
-            startActivity(i);
-        });
 
         recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerViewShow();
+        recyclerViewShow("");
+
+        searchView = view.findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.toString()!=null){
+                    recyclerViewShow(newText.toString());
+                } else {
+                    recyclerViewShow("");
+                }
+                return false;
+            }
+        });
         return view;
     }
 
@@ -152,13 +168,13 @@ public class DashBoardFragment extends Fragment {
         Calendar c = Calendar.getInstance();
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
 
-        if (timeOfDay >= 0 && timeOfDay < 12) {
+        if (timeOfDay >= 4 && timeOfDay < 12) {
             currentTime = "Good morning";
         } else if (timeOfDay >= 12 && timeOfDay < 16) {
             currentTime = "Good afternoon";
         } else if (timeOfDay >= 16 && timeOfDay < 21) {
             currentTime = "Good evening";
-        } else if (timeOfDay >= 21 && timeOfDay < 24) {
+        } else if ((timeOfDay >= 0 && timeOfDay < 4) || (timeOfDay >= 21 && timeOfDay < 24)) {
             currentTime = "Good night";
         }
 
@@ -167,7 +183,9 @@ public class DashBoardFragment extends Fragment {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
+                            String name = snapshot.child("name").getValue().toString();
+
+                            CurrentUserName.setText("Hello " + name.substring(0, name.indexOf(' ')).trim() + ",\n" + currentTime);
                             Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
                                     .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }
@@ -181,9 +199,9 @@ public class DashBoardFragment extends Fragment {
     }
 
 
-    public void recyclerViewShow() {
+    public void recyclerViewShow(String data) {
 
-        Query query = reference.child("noteList");
+        Query query = reference.child("noteList").orderByChild("noteDesc").startAt(data).endAt(data+"\uf8ff");
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
@@ -234,6 +252,7 @@ public class DashBoardFragment extends Fragment {
                             public void onClick(View v) {
                                 Intent intent = new Intent(requireActivity(), EditNoteActivity.class);
                                 intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
+                                intent.putExtra(EditNoteActivity.FROM_ACTIVITY, EditNoteActivity.DASHBOARD);
                                 intent.putExtra(EditNoteActivity.NOTE_DATA, model);
                                 startActivity(intent);
                             }
@@ -242,7 +261,8 @@ public class DashBoardFragment extends Fragment {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-
+                                Vibrator vb = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                                vb.vibrate(35);
                                 popUpDialogForNote(model);
 
                                 return false;
@@ -290,6 +310,11 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 note.setIsPinned(false);
+
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
+                String deletedDate = currentDate.format(calendar.getTime());
+
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
@@ -307,6 +332,22 @@ public class DashBoardFragment extends Fragment {
                                         if (task.isComplete()) {
                                             fromReference.removeValue();
                                             Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
+
+                                            toReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()) {
+                                                        snapshot.child("deletedDate").getRef().setValue(deletedDate);
+                                                        snapshot.child("lastEditTime").getRef().removeValue();
+                                                        snapshot.child("deletedFrom").getRef().setValue("dashboard");
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+
                                         } else {
                                             Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
                                         }

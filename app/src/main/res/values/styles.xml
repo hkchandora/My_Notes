@@ -14,7 +14,6 @@
 
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">@bool/use_light_status</item>
-
     </style>
 
     <style name="CropTheme" parent="Theme.MaterialComponents.Light.DarkActionBar"/>

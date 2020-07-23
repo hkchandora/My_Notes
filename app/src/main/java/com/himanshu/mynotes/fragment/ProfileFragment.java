@@ -95,11 +95,13 @@ public class ProfileFragment extends Fragment {
         ProfileImage = view.findViewById(R.id.profile_image);
         ProfileCardView = view.findViewById(R.id.profile_image_card_view);
 
-        String[] title = {"Pin","Archive","Delete", "About"};
-        int[] image = {R.drawable.pin_icon,
+        String[] title = {"Pin", "Archive", "Delete", "About", "Log Out"};
+        int[] image = {
+                R.drawable.ic_pushpin,
                 R.drawable.archive_icon,
-                R.drawable.delete_icon,
-                R.drawable.ic_about};
+                R.drawable.ic_delete,
+                R.drawable.ic_about,
+                R.drawable.logout};
         recyclerView = view.findViewById(R.id.profile_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(new ProfileItemAdapter(getContext(), title, image));
@@ -137,7 +139,7 @@ public class ProfileFragment extends Fragment {
                 if (snapshot.exists()) {
                     ProfileName.setText(snapshot.child("name").getValue().toString());
                     ProfileEmail.setText(snapshot.child("emailId").getValue().toString());
-                    Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
+                    Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
                             .placeholder(R.drawable.profilemale).into(ProfileImage);
                 }
             }
