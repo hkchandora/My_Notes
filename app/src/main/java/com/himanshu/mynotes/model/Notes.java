@@ -1,30 +1,57 @@
 package com.himanshu.mynotes.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
-public class Notes implements Comparable<Notes>{
+public class Notes implements Parcelable {
 
-    String nid, noteTitle, noteDesc, timeOfCreation, lastEditTime, tileColor, isPinned;
+    private String noteId;
+    private String noteTitle;
+    private String noteDesc;
+    private String timeOfCreation;
+    private String lastEditTime;
+    private String tileColor;
+    private String deletedDate;
+    private boolean isPinned;
+    private long createdTimeStamp;
+    private long lastEditedTimeStamp;
 
     public Notes() {
     }
 
-    public Notes(String nid, String noteTitle, String noteDesc, String timeOfCreation, String lastEditTime, String tileColor, String isPinned) {
-        this.nid = nid;
-        this.noteTitle = noteTitle;
-        this.noteDesc = noteDesc;
-        this.timeOfCreation = timeOfCreation;
-        this.lastEditTime = lastEditTime;
-        this.tileColor = tileColor;
-        this.isPinned = isPinned;
+    protected Notes(Parcel in) {
+        noteId = in.readString();
+        noteTitle = in.readString();
+        noteDesc = in.readString();
+        timeOfCreation = in.readString();
+        lastEditTime = in.readString();
+        deletedDate = in.readString();
+        tileColor = in.readString();
+        isPinned = in.readByte() != 0;
+        createdTimeStamp = in.readLong();
+        lastEditedTimeStamp = in.readLong();
     }
 
-    public String getNid() {
-        return nid;
+    public static final Creator<Notes> CREATOR = new Creator<Notes>() {
+        @Override
+        public Notes createFromParcel(Parcel in) {
+            return new Notes(in);
+        }
+
+        @Override
+        public Notes[] newArray(int size) {
+            return new Notes[size];
+        }
+    };
+
+    public String getNoteId() {
+        return noteId;
     }
 
-    public void setNid(String nid) {
-        this.nid = nid;
+    public void setNoteId(String noteId) {
+        this.noteId = noteId;
     }
 
     public String getNoteTitle() {
@@ -67,17 +94,36 @@ public class Notes implements Comparable<Notes>{
         this.tileColor = tileColor;
     }
 
-    public String getIsPinned() {
+    public boolean getIsPinned() {
         return isPinned;
     }
 
-    public void setIsPinned(String isPinned) {
+    public void setIsPinned(boolean isPinned) {
         this.isPinned = isPinned;
     }
 
-    @Override
-    public int compareTo(Notes notes) {
-        return this.timeOfCreation.compareTo(notes.getTimeOfCreation());
+    public long getCreatedTimeStamp() {
+        return createdTimeStamp;
+    }
+
+    public void setCreatedTimeStamp(long createdTimeStamp) {
+        this.createdTimeStamp = createdTimeStamp;
+    }
+
+    public long getLastEditedTimeStamp() {
+        return lastEditedTimeStamp;
+    }
+
+    public void setLastEditedTimeStamp(long lastEditedTimeStamp) {
+        this.lastEditedTimeStamp = lastEditedTimeStamp;
+    }
+
+    public String getDeletedDate() {
+        return deletedDate;
+    }
+
+    public void setDeletedDate(String deletedDate) {
+        this.deletedDate = deletedDate;
     }
 
     @NonNull
@@ -85,4 +131,24 @@ public class Notes implements Comparable<Notes>{
     public String toString() {
         return super.toString();
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
+        parcel.writeString(noteId);
+        parcel.writeString(noteTitle);
+        parcel.writeString(noteDesc);
+        parcel.writeString(timeOfCreation);
+        parcel.writeString(lastEditTime);
+        parcel.writeString(tileColor);
+        parcel.writeByte((byte) (isPinned ? 1 : 0));
+        parcel.writeLong(createdTimeStamp);
+        parcel.writeLong(lastEditedTimeStamp);
+    }
+
 }

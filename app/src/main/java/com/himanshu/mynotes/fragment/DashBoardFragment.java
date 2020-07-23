@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,25 +38,27 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.himanshu.mynotes.DashBoardActivity;
+import com.himanshu.mynotes.AppsPrefs;
 import com.himanshu.mynotes.EditNoteActivity;
+import com.himanshu.mynotes.FirebaseRepository;
 import com.himanshu.mynotes.MainActivity;
 import com.himanshu.mynotes.R;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
+import com.himanshu.mynotes.listeners.OnFetchColorsListener;
+import com.himanshu.mynotes.model.NoteColor;
 import com.himanshu.mynotes.model.Notes;
+import com.himanshu.mynotes.util.CryptoUtil;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Objects;
+import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link DashBoardFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class DashBoardFragment extends Fragment {
 
+    private static final String TAG = "DashBoardFragment";
 
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
@@ -63,58 +67,38 @@ public class DashBoardFragment extends Fragment {
     private RecyclerView recyclerView;
     private TextView CurrentUserName;
     private String currentTime = "";
-    int currentColor = 0;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public DashBoardFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment DashBoardFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DashBoardFragment newInstance(String param1, String param2) {
-        DashBoardFragment fragment = new DashBoardFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private CardView addNoteCard;
+    private SearchView searchView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
         auth = FirebaseAuth.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference()
-                .child(auth.getCurrentUser().getUid()).child("noteList");
+        reference = FirebaseDatabase.getInstance().getReference().child("notes")
+                .child(auth.getCurrentUser().getUid());
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
 
         checkAnyNoteIsAvailable();
-
         retrieveCurrentUserInfo();
+        fetchColors();
+    }
 
-//        recyclerViewShow();
+    private void fetchColors() {
+        FirebaseRepository.getInstance().fetchColors(new OnFetchColorsListener() {
+            @Override
+            public void onSuccess(List<NoteColor> colorsList) {
+                AppsPrefs.getInstance(requireActivity()).saveColorsList(colorsList);
+            }
 
+            @Override
+            public void onFailure(String errorMessage) {
+                Log.d(TAG, "onFailure: " + errorMessage);
+            }
+        });
     }
 
     @Override
@@ -122,23 +106,54 @@ public class DashBoardFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
-        CurrentUserName = (TextView) view.findViewById(R.id.dashboard_name);
-        ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
-        recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
 
+        addNoteCard = view.findViewById(R.id.add_new_note_card);
+
+        CurrentUserName = view.findViewById(R.id.dashboard_name);
+        ProfileImage = (ImageView) view.findViewById(R.id.dashboard_profile_image);
+
+        recyclerView = (RecyclerView) view.findViewById(R.id.dashboard_recyclerView);
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerViewShow();
+        recyclerViewShow("");
+
+        searchView = view.findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.toString()!=null){
+                    recyclerViewShow(newText.toString());
+                } else {
+                    recyclerViewShow("");
+                }
+                return false;
+            }
+        });
         return view;
     }
 
     public void checkAnyNoteIsAvailable() {
-        reference.addValueEventListener(new ValueEventListener() {
+        addNoteCard.setVisibility(View.GONE);
+        reference.child("noteList").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
-                    Toast.makeText(getActivity(), "No Notes Exists", Toast.LENGTH_SHORT).show();
+
+                    addNoteCard.setVisibility(View.VISIBLE);
+                    addNoteCard.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent i = new Intent(getActivity(), EditNoteActivity.class);
+                            i.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_CREATE_NOTE);
+                            startActivity(i);
+                        }
+                    });
                 }
             }
 
@@ -153,24 +168,25 @@ public class DashBoardFragment extends Fragment {
         Calendar c = Calendar.getInstance();
         int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
 
-        if (timeOfDay >= 0 && timeOfDay < 12) {
+        if (timeOfDay >= 4 && timeOfDay < 12) {
             currentTime = "Good morning";
         } else if (timeOfDay >= 12 && timeOfDay < 16) {
             currentTime = "Good afternoon";
         } else if (timeOfDay >= 16 && timeOfDay < 21) {
             currentTime = "Good evening";
-        } else if (timeOfDay >= 21 && timeOfDay < 24) {
+        } else if ((timeOfDay >= 0 && timeOfDay < 4) || (timeOfDay >= 21 && timeOfDay < 24)) {
             currentTime = "Good night";
         }
 
-        final String finalTime = currentTime;
-        FirebaseDatabase.getInstance().getReference().child(auth.getCurrentUser().getUid()).child("userDetails")
+        FirebaseDatabase.getInstance().getReference().child("userDetails").child(auth.getCurrentUser().getUid())
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            CurrentUserName.setText("Hello " + snapshot.child("name").getValue().toString() + ",\n" + currentTime);
-                            Picasso.with(getActivity()).load(snapshot.child("photoUrl").getValue().toString())
+                            String name = snapshot.child("name").getValue().toString();
+
+                            CurrentUserName.setText("Hello " + name.substring(0, name.indexOf(' ')).trim() + ",\n" + currentTime);
+                            Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
                                     .placeholder(R.drawable.profilemale).into(ProfileImage);
                         }
                     }
@@ -182,9 +198,10 @@ public class DashBoardFragment extends Fragment {
                 });
     }
 
-    public void recyclerViewShow() {
 
-        Query query = reference;
+    public void recyclerViewShow(String data) {
+
+        Query query = reference.child("noteList").orderByChild("noteDesc").startAt(data).endAt(data+"\uf8ff");
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
@@ -196,57 +213,46 @@ public class DashBoardFragment extends Fragment {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
-                        String getColor = model.getTileColor();
+                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+                                model.setNoteTitle(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
-                        switch (getColor) {
-                            case "1":
-                                currentColor = R.color.color_one;
-                                break;
-                            case "2":
-                                currentColor = R.color.color_two;
-                                break;
-                            case "3":
-                                currentColor = R.color.color_three;
-                                break;
-                            case "4":
-                                currentColor = R.color.color_four;
-                                break;
-                            case "5":
-                                currentColor = R.color.color_five;
-                                break;
-                            case "6":
-                                currentColor = R.color.color_six;
-                                break;
-                            case "7":
-                                currentColor = R.color.color_seven;
-                                break;
-                            case "8":
-                                currentColor = R.color.color_eight;
-                                break;
+                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+                                model.setNoteDesc(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
-                        holder.cardView.setCardBackgroundColor(getResources().getColor(currentColor));
+                        holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
                         if (model.getNoteTitle().equals("")) {
-                            holder.Title.setVisibility(View.INVISIBLE);
+                            holder.Title.setVisibility(View.GONE);
                         } else if (!model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.VISIBLE);
                             holder.Title.setText(model.getNoteTitle());
                         }
 
-                        if (model.getIsPinned().equals("true")) {
+                        if (model.getIsPinned()) {
                             holder.Pin.setVisibility(View.VISIBLE);
-                        } else if (model.getIsPinned().equals("false")) {
+                        } else if (!model.getIsPinned()) {
                             holder.Pin.setVisibility(View.INVISIBLE);
                         }
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(getActivity(), EditNoteActivity.class);
-                                intent.putExtra("type", "editNote");
-                                intent.putExtra("nid", model.getNid());
+                                Intent intent = new Intent(requireActivity(), EditNoteActivity.class);
+                                intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
+                                intent.putExtra(EditNoteActivity.NOTE_DATA, model);
                                 startActivity(intent);
                             }
                         });
@@ -254,10 +260,9 @@ public class DashBoardFragment extends Fragment {
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-
-//                                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//                                vibrator.vibrate(100);
-                                popUpDialogForNote(model.getNoteTitle(), model.getNoteDesc(), model.getTimeOfCreation(), currentColor, model.getNid());
+                                Vibrator vb = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+                                vb.vibrate(35);
+                                popUpDialogForNote(model);
 
                                 return false;
                             }
@@ -276,69 +281,85 @@ public class DashBoardFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
         adapter.startListening();
-        adapter.notifyItemInserted(1);
-        adapter.notifyItemRemoved(1);
+//        adapter.notifyItemInserted(1);
+//        adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(final String title, final String description, String date, int bgColor, final String nid) {
+    public void popUpDialogForNote(Notes note) {
 
-        final Dialog dialog = new Dialog(getActivity());
+        final Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_long_press_note);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         TextView TitleTxt = dialog.findViewById(R.id.dialog_long_press_title);
         TextView DescriptionTxt = dialog.findViewById(R.id.dialog_long_press_description);
         TextView DateTxt = dialog.findViewById(R.id.dialog_long_press_date);
-        Button DeleteBtn = dialog.findViewById(R.id.dialog_long_press_delete_btn);
-        Button ArchiveBtn = dialog.findViewById(R.id.dialog_long_press_archive_btn);
-        Button CopyBtn = dialog.findViewById(R.id.dialog_long_press_copy_btn);
-        Button PinBtn = dialog.findViewById(R.id.dialog_long_press_pin_btn);
+        ImageView DeleteBtn = dialog.findViewById(R.id.dialog_long_press_delete_btn);
+        ImageView ArchiveBtn = dialog.findViewById(R.id.dialog_long_press_archive_btn);
+        ImageView CopyBtn = dialog.findViewById(R.id.dialog_long_press_copy_btn);
+        ImageView PinBtn = dialog.findViewById(R.id.dialog_long_press_pin_btn);
         CardView cardView = dialog.findViewById(R.id.dialog_long_press_cardView);
 
-        TitleTxt.setText(title);
-        DescriptionTxt.setText(description);
-        DateTxt.setText(date);
-        cardView.setCardBackgroundColor(getResources().getColor(bgColor));
+        TitleTxt.setText(note.getNoteTitle());
+        DescriptionTxt.setText(note.getNoteDesc());
+        DateTxt.setText(note.getTimeOfCreation());
+        cardView.setCardBackgroundColor(Color.parseColor(note.getTileColor()));
 
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(nid);
+                note.setIsPinned(false);
+
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
+                String deletedDate = currentDate.format(calendar.getTime());
+
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(note.getNoteId());
 
                 fromReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (Objects.requireNonNull(snapshot.child("isPinned").getValue()).equals("false")) {
-                            ValueEventListener valueEventListener = new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isComplete()) {
-                                                fromReference.removeValue();
-                                                Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
-                                                dialog.dismiss();
-                                            } else {
-                                                Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
-                                                dialog.dismiss();
-                                            }
-                                        }
-                                    });
-                                }
+                        ValueEventListener valueEventListener = new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isComplete()) {
+                                            fromReference.removeValue();
+                                            Toast.makeText(getActivity(), "Deleted", Toast.LENGTH_SHORT).show();
 
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                }
-                            };
-                            fromReference.addListenerForSingleValueEvent(valueEventListener);
-                        } else if (snapshot.child("isPinned").getValue().equals("true")) {
-                            dialog.dismiss();
-                            Toast.makeText(getActivity(), "For delete this note ypu have to unpin first", Toast.LENGTH_SHORT).show();
-                        }
+                                            toReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()) {
+                                                        snapshot.child("deletedDate").getRef().setValue(deletedDate);
+                                                        snapshot.child("lastEditTime").getRef().removeValue();
+                                                    }
+                                                }
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+
+                                        } else {
+                                            Toast.makeText(getActivity(), "Failed", Toast.LENGTH_SHORT).show();
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        };
+                        fromReference.addListenerForSingleValueEvent(valueEventListener);
+                        dialog.dismiss();
                     }
 
                     @Override
@@ -352,10 +373,10 @@ public class DashBoardFragment extends Fragment {
         ArchiveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference()
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
-                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference()
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(nid);
+                final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
+                final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(note.getNoteId());
 
                 ValueEventListener valueEventListener = new ValueEventListener() {
                     @Override
@@ -386,10 +407,10 @@ public class DashBoardFragment extends Fragment {
         CopyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String text = title + "\n" + description;
-//                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-//                ClipData clip = ClipData.newPlainText("Note", text);
-//                clipboard.setPrimaryClip(clip);
+                String text = note.getNoteTitle() + "\n" + note.getNoteDesc();
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("Note", text);
+                clipboard.setPrimaryClip(clip);
                 Toast.makeText(getActivity(), "Note Copied", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
@@ -398,20 +419,21 @@ public class DashBoardFragment extends Fragment {
         PinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference()
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(nid);
+                DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference().child("notes")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());
 
                 pinReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            String checkPin = "";
-                            checkPin = snapshot.child("isPinned").getValue().toString();
-                            if (checkPin.equals("true")) {
-                                snapshot.getRef().child("isPinned").setValue("false");
-                            } else if (checkPin.equals("false")) {
-                                snapshot.getRef().child("isPinned").setValue("true");
+                            boolean checkPin;
+                            checkPin = (boolean) snapshot.child("isPinned").getValue();
+                            if (checkPin) {
+                                snapshot.getRef().child("isPinned").setValue(false);
+                            } else {
+                                snapshot.getRef().child("isPinned").setValue(true);
                             }
+                            dialog.dismiss();
                         }
                     }
 
@@ -420,15 +442,9 @@ public class DashBoardFragment extends Fragment {
 
                     }
                 });
-                dialog.dismiss();
             }
         });
         dialog.show();
     }
 
-
-    public void logOutAccountBtn(View view) {
-        FirebaseAuth.getInstance().signOut();
-        startActivity(new Intent(getActivity(), MainActivity.class));
-    }
 }

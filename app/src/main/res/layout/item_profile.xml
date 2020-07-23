@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="60dp"
+    android:layout_height="70dp"
     xmlns:tools="http://schemas.android.com/tools">
 
 
     <ImageView
         android:id="@+id/item_profile_icon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
         android:layout_centerVertical="true"
         android:src="@drawable/ic_add_circle"
         android:layout_marginStart="20dp"/>
@@ -21,16 +21,15 @@
         android:transitionName="title_transition"
         android:textAllCaps="false"
         android:textColor="#000"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:layout_marginStart="80dp"
+        android:textSize="20sp"
+        android:layout_marginStart="70dp"
         android:layout_centerVertical="true"
         />
 
     <Button
         android:id="@+id/item_profile_arrow"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
         android:transitionName="arrow_transition"
@@ -40,7 +39,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#000"
+        android:background="@color/gray_500"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_alignParentBottom="true"/>
