@@ -128,7 +128,7 @@ public class EditNoteActivity extends AppCompatActivity {
     }
 
     public void backPress(View view) {
-        onBackPressed();
+        saveNoteInfo();
     }
 
     public void saveNoteInfo() {
@@ -176,10 +176,10 @@ public class EditNoteActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError error) {
                 }
             });
+            finish();
         } else if (type.equals(ACTION_CREATE_NOTE)) {
             String titleTxt = Title.getText().toString().trim();
             String descriptionTxt = Description.getText().toString().trim();
-
 
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
@@ -213,12 +213,9 @@ public class EditNoteActivity extends AppCompatActivity {
             reference.child(noteModel.getNoteId()).setValue(noteModel);
             Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
             finish();
-        } else {
-            finish();
         }
     }
 
-    @Override
     public void onBackPressed() {
         saveNoteInfo();
     }
