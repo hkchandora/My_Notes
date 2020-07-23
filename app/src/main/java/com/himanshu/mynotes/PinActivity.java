@@ -36,6 +36,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
+import com.himanshu.mynotes.util.CryptoUtil;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 
 import java.util.Objects;
@@ -58,11 +59,12 @@ public class PinActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.pin_recyclerView);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
+
+        recyclerViewShow();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+
+    public void recyclerViewShow(){
 
         Query query = reference.orderByChild("isPinned").equalTo(true);
 
@@ -75,6 +77,24 @@ public class PinActivity extends AppCompatActivity {
                 new FirebaseRecyclerAdapter<Notes, NoteViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
+
+                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+                                model.setNoteTitle(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+                                model.setNoteDesc(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
@@ -133,6 +153,7 @@ public class PinActivity extends AppCompatActivity {
         UnpinBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 DatabaseReference pinReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(model.getNoteId());
 
@@ -142,7 +163,6 @@ public class PinActivity extends AppCompatActivity {
                         if (snapshot.exists()) {
                             snapshot.getRef().child("isPinned").setValue(false);
                             Toast.makeText(PinActivity.this, "Unpinned", Toast.LENGTH_SHORT).show();
-                            dialog.dismiss();
                         }
                     }
 

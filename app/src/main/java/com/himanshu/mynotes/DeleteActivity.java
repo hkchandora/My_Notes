@@ -37,6 +37,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
+import com.himanshu.mynotes.util.CryptoUtil;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
 
 import java.text.SimpleDateFormat;
@@ -49,6 +50,7 @@ public class DeleteActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
+    private String deletedFrom = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +65,10 @@ public class DeleteActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         checkWhenNoteDeleted();
-
+        recyclerViewShow();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    public void recyclerViewShow() {
 
         Query query = reference;
 
@@ -81,11 +81,32 @@ public class DeleteActivity extends AppCompatActivity {
                 new FirebaseRecyclerAdapter<Notes, NoteViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
-
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setVisibility(View.GONE);
                         holder.deletedDate.setVisibility(View.VISIBLE);
                         holder.deletedDate.setText("Deleted on : "+ model.getDeletedDate());
+                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+                                model.setNoteTitle(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+                                model.setNoteDesc(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        holder.Description.setText(model.getNoteDesc());
+                        holder.Date.setVisibility(View.GONE);
+                        holder.deletedDate.setVisibility(View.VISIBLE);
+                        holder.deletedDate.setText("Deleted on : " + model.getDeletedDate());
                         holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
                         if (model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.GONE);
@@ -93,6 +114,13 @@ public class DeleteActivity extends AppCompatActivity {
                             holder.Title.setVisibility(View.VISIBLE);
                             holder.Title.setText(model.getNoteTitle());
                         }
+
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                popUpDialogForNote(model);
+                            }
+                        });
 
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
@@ -167,33 +195,75 @@ public class DeleteActivity extends AppCompatActivity {
         RestoreBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes").child(model.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(model.getNoteId());
+                final DatabaseReference toReference2 = FirebaseDatabase.getInstance().getReference().child("notes")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(model.getNoteId());
 
-                ValueEventListener valueEventListener = new ValueEventListener() {
+
+                fromReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isComplete()) {
-                                    fromReference.removeValue();
-                                    Toast.makeText(DeleteActivity.this, "Restored", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(DeleteActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            deletedFrom = snapshot.child("deletedFrom").getValue().toString();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+                if (deletedFrom.equals("dashboard")) {
+                    ValueEventListener valueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            toReference.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isComplete()) {
+                                        fromReference.removeValue();
+                                        Toast.makeText(DeleteActivity.this, "Restored", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(DeleteActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                                dialog.dismiss();
-                            }
-                        });
-                    }
+                            });
+                        }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                };
-                fromReference.addListenerForSingleValueEvent(valueEventListener);
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    };
+                    fromReference.addListenerForSingleValueEvent(valueEventListener);
+                } else if (deletedFrom.equals("archive")) {
+                    ValueEventListener valueEventListener = new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            toReference2.setValue(dataSnapshot.getValue()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isComplete()) {
+                                        fromReference.removeValue();
+                                        Toast.makeText(DeleteActivity.this, "Restored", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(DeleteActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                    dialog.dismiss();
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    };
+                    fromReference.addListenerForSingleValueEvent(valueEventListener);
+                }
             }
         });
         dialog.show();
@@ -216,7 +286,7 @@ public class DeleteActivity extends AppCompatActivity {
                         Date date2 = new Date(storeDate);
                         long diff = date.getTime() - date2.getTime();
 
-                        if ((TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS))> 7) {
+                        if ((TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)) > 7) {
                             dn.getRef().removeValue();
                         }
                     }

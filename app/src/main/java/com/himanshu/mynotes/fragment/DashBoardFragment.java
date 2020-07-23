@@ -252,6 +252,7 @@ public class DashBoardFragment extends Fragment {
                             public void onClick(View v) {
                                 Intent intent = new Intent(requireActivity(), EditNoteActivity.class);
                                 intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
+                                intent.putExtra(EditNoteActivity.FROM_ACTIVITY, EditNoteActivity.DASHBOARD);
                                 intent.putExtra(EditNoteActivity.NOTE_DATA, model);
                                 startActivity(intent);
                             }
@@ -338,6 +339,7 @@ public class DashBoardFragment extends Fragment {
                                                     if (snapshot.exists()) {
                                                         snapshot.child("deletedDate").getRef().setValue(deletedDate);
                                                         snapshot.child("lastEditTime").getRef().removeValue();
+                                                        snapshot.child("deletedFrom").getRef().setValue("dashboard");
                                                     }
                                                 }
                                                 @Override

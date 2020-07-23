@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -34,7 +35,11 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.animation.CustomItemAnimation;
 import com.himanshu.mynotes.model.Notes;
+import com.himanshu.mynotes.util.CryptoUtil;
 import com.himanshu.mynotes.viewHolder.NoteViewHolder;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class ArchiveActivity extends AppCompatActivity {
 
@@ -53,12 +58,11 @@ public class ArchiveActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.archive_recyclerView);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
+
+        recyclerViewShow();
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-
+    public void recyclerViewShow(){
         Query query = reference;
 
         FirebaseRecyclerOptions<Notes> options =
@@ -71,6 +75,24 @@ public class ArchiveActivity extends AppCompatActivity {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
+                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+                                model.setNoteTitle(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+                                model.setNoteDesc(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
                         holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
@@ -80,6 +102,17 @@ public class ArchiveActivity extends AppCompatActivity {
                             holder.Title.setVisibility(View.VISIBLE);
                             holder.Title.setText(model.getNoteTitle());
                         }
+
+                        holder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(ArchiveActivity.this, EditNoteActivity.class);
+                                intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
+                                intent.putExtra(EditNoteActivity.FROM_ACTIVITY, EditNoteActivity.ARCHIVE);
+                                intent.putExtra(EditNoteActivity.NOTE_DATA, model);
+                                startActivity(intent);
+                            }
+                        });
 
                         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
@@ -129,6 +162,11 @@ public class ArchiveActivity extends AppCompatActivity {
         DeleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
+                String deletedDate = currentDate.format(calendar.getTime());
+
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(model.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")
@@ -143,10 +181,24 @@ public class ArchiveActivity extends AppCompatActivity {
                                 if (task.isComplete()) {
                                     fromReference.removeValue();
                                     Toast.makeText(ArchiveActivity.this, "Moved to bin", Toast.LENGTH_SHORT).show();
+
+                                    toReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if (snapshot.exists()) {
+                                                snapshot.child("deletedDate").getRef().setValue(deletedDate);
+                                                snapshot.child("lastEditTime").getRef().removeValue();
+                                                snapshot.child("deletedFrom").getRef().setValue("archive");
+                                            }
+                                        }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                 } else {
                                     Toast.makeText(ArchiveActivity.this, "Failed", Toast.LENGTH_SHORT).show();
                                 }
-                                dialog.dismiss();
                             }
                         });
                     }
@@ -161,6 +213,7 @@ public class ArchiveActivity extends AppCompatActivity {
         UnarchiveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog.dismiss();
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("archivedNotes").child(model.getNoteId());
                 final DatabaseReference toReference = FirebaseDatabase.getInstance().getReference().child("notes")

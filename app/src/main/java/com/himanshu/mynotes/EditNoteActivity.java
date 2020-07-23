@@ -38,12 +38,18 @@ public class EditNoteActivity extends AppCompatActivity {
     public static final String ACTION_EDIT_NOTE = "edit_note";
     public static final String ACTION_CREATE_NOTE = "create_note";
     public static final String NOTE_DATA = "note_data";
+    public static final String FROM_ACTIVITY = "from_activity";
+    public static final String DASHBOARD = "dashboard";
+    public static final String ARCHIVE = "archive";
     private String type = "";
     private EditText Title, Description;
     private DatabaseReference reference;
     private String NoteTitle = "", NoteDescription = "";
     private Notes noteModel;
     private TextView ToolBarTitle;
+    private String fromActivity = "";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +113,13 @@ public class EditNoteActivity extends AppCompatActivity {
 
     }
 
+
     public void forEditNoteActivity() {
         ToolBarTitle.setText("Edit Note");
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
+            fromActivity = bundle.getString(FROM_ACTIVITY);
             noteModel = getIntent().getParcelableExtra(NOTE_DATA);
             if (noteModel == null) {
                 Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show();
@@ -160,23 +168,42 @@ public class EditNoteActivity extends AppCompatActivity {
                 }
             }
 
+            if (fromActivity.equals(DASHBOARD)) {
+                reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().child("noteTitle").setValue(NoteTitle);
+                        snapshot.getRef().child("noteDesc").setValue(NoteDescription);
+                        snapshot.getRef().child("lastEditTime").setValue(editTime);
+                        snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
+                        snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
+                        Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
+                    }
 
-            reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    snapshot.getRef().child("noteTitle").setValue(NoteTitle);
-                    snapshot.getRef().child("noteDesc").setValue(NoteDescription);
-                    snapshot.getRef().child("lastEditTime").setValue(editTime);
-                    snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
-                    snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
-                    Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
-                }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
+            } else if(fromActivity.equals(ARCHIVE)){
+                FirebaseDatabase.getInstance().getReference().child("notes")
+                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .child("archivedNotes").child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        snapshot.getRef().child("noteTitle").setValue(NoteTitle);
+                        snapshot.getRef().child("noteDesc").setValue(NoteDescription);
+                        snapshot.getRef().child("lastEditTime").setValue(editTime);
+                        snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
+                        snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
+                        Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
+                    }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                 }
             });
             finish();
+            }
         } else if (type.equals(ACTION_CREATE_NOTE)) {
             String titleTxt = Title.getText().toString().trim();
             String descriptionTxt = Description.getText().toString().trim();
