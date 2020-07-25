@@ -25,4 +25,11 @@
         <item name="titleTextAppearance">@string/add_note</item>
         <item name="titleTextColor">@android:color/black</item>
     </style>
+
+    <style name="ViewPager" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <!-- Customize your theme here. -->
+    <item name="colorPrimary">@color/viewPagerColorPrimary</item>
+    <item name="colorPrimaryDark">@color/viewPagerColorPrimaryDark</item>
+    <item name="colorAccent">@color/viewPagerColorAccent</item>
+    </style>
 </resources>

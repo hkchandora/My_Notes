@@ -50,7 +50,6 @@ public class EditNoteActivity extends AppCompatActivity {
     private String fromActivity = "";
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -142,8 +141,8 @@ public class EditNoteActivity extends AppCompatActivity {
     public void saveNoteInfo() {
         if (type.equals(ACTION_EDIT_NOTE)) {
 
-            NoteTitle = Title.getText().toString();
-            NoteDescription = Description.getText().toString();
+            NoteTitle = Title.getText().toString().trim();
+            NoteDescription = Description.getText().toString().trim();
 
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
@@ -167,41 +166,47 @@ public class EditNoteActivity extends AppCompatActivity {
 //                    e.printStackTrace();
 //                }
 //            }
+            if ((!NoteTitle.equals("") && !NoteDescription.equals("")) || (NoteTitle.equals("") && !NoteDescription.equals(""))) {
+                if (fromActivity.equals(DASHBOARD)) {
+                    reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            snapshot.getRef().child("noteTitle").setValue(NoteTitle);
+                            snapshot.getRef().child("noteDesc").setValue(NoteDescription);
+                            snapshot.getRef().child("lastEditTime").setValue(editTime);
+                            snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
+                            snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
+                        }
 
-            if (fromActivity.equals(DASHBOARD)) {
-                reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.getRef().child("noteTitle").setValue(NoteTitle);
-                        snapshot.getRef().child("noteDesc").setValue(NoteDescription);
-                        snapshot.getRef().child("lastEditTime").setValue(editTime);
-                        snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
-                        snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
-                    }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                        }
+                    });
+                    finish();
+                } else if (fromActivity.equals(ARCHIVE)) {
+                    FirebaseDatabase.getInstance().getReference().child("notes")
+                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .child("archivedNotes").child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            snapshot.getRef().child("noteTitle").setValue(NoteTitle);
+                            snapshot.getRef().child("noteDesc").setValue(NoteDescription);
+                            snapshot.getRef().child("lastEditTime").setValue(editTime);
+                            snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
+                            snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
+                        }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
-                finish();
-            } else if(fromActivity.equals(ARCHIVE)){
-                FirebaseDatabase.getInstance().getReference().child("notes")
-                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .child("archivedNotes").child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        snapshot.getRef().child("noteTitle").setValue(NoteTitle);
-                        snapshot.getRef().child("noteDesc").setValue(NoteDescription);
-                        snapshot.getRef().child("lastEditTime").setValue(editTime);
-                        snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
-                        snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
-                    }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                        }
+                    });
+                    finish();
                 }
-            });
-            finish();
+            } else if (!NoteTitle.equals("") && NoteDescription.equals("")) {
+                Description.setError("Required");
+            } else if (NoteTitle.equals("") && NoteTitle.equals("")) {
+                Title.setError("Required");
+                Description.setError("Required");
             }
         } else if (type.equals(ACTION_CREATE_NOTE)) {
             String titleTxt = Title.getText().toString().trim();
@@ -227,16 +232,18 @@ public class EditNoteActivity extends AppCompatActivity {
 //                }
 //            }
 
-            noteModel.setNoteTitle(titleTxt);
-            noteModel.setNoteId(noteModel.getNoteId());
-            noteModel.setNoteDesc(descriptionTxt);
-            noteModel.setTimeOfCreation(saveCurrentDate);
-            noteModel.setLastEditTime(saveCurrentDate);
-            noteModel.setIsPinned(false);
-            long timeStamp = System.currentTimeMillis();
-            noteModel.setCreatedTimeStamp(timeStamp);
-            noteModel.setLastEditedTimeStamp(timeStamp);
-            reference.child(noteModel.getNoteId()).setValue(noteModel);
+            if ((!titleTxt.equals("") && !descriptionTxt.equals("")) || (titleTxt.equals("") && !descriptionTxt.equals(""))) {
+                noteModel.setNoteTitle(titleTxt);
+                noteModel.setNoteId(noteModel.getNoteId());
+                noteModel.setNoteDesc(descriptionTxt);
+                noteModel.setTimeOfCreation(saveCurrentDate);
+                noteModel.setLastEditTime(saveCurrentDate);
+                noteModel.setIsPinned(false);
+                long timeStamp = System.currentTimeMillis();
+                noteModel.setCreatedTimeStamp(timeStamp);
+                noteModel.setLastEditedTimeStamp(timeStamp);
+                reference.child(noteModel.getNoteId()).setValue(noteModel);
+            }
             finish();
         }
     }

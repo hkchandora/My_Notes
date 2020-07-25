@@ -286,7 +286,7 @@ public class DashBoardFragment extends Fragment {
 //        adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(Notes note) {
+    public void popUpDialogForNote(final Notes note) {
 
         final Dialog dialog = new Dialog(requireActivity());
         dialog.setContentView(R.layout.dialog_long_press_note);
@@ -313,7 +313,7 @@ public class DashBoardFragment extends Fragment {
 
                 Calendar calendar = Calendar.getInstance();
                 SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
-                String deletedDate = currentDate.format(calendar.getTime());
+                final String deletedDate = currentDate.format(calendar.getTime());
 
                 final DatabaseReference fromReference = FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList").child(note.getNoteId());

@@ -32,7 +32,7 @@ public class SplashScreen extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
-                        startActivity(new Intent(getApplicationContext(), MainDashBoardActivity.class));
+                        startActivity(new Intent(getApplicationContext(), OnBoardingActivity.class));
                         finish();
                     }
                 }
@@ -47,7 +47,7 @@ public class SplashScreen extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
-                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                        startActivity(new Intent(getApplicationContext(), OnBoardingActivity.class));
                         finish();
                     }
                 }

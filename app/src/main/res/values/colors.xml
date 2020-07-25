@@ -3,6 +3,12 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="viewPagerColorPrimary">#2196F3</color>
+    <color name="viewPagerColorPrimaryDark">#1976D2</color>
+    <color name="viewPagerColorAccent">#FF5252</color>
+    <color name="colorTextPrimary">#212121</color>
+    <color name="colorTextSecondary">#757575</color>
+    <color name="colorOnBoardingIndicatorInactive">#72BCF7</color>
     <color name="black">#0E0E0E</color>
     <color name="white">#FFFFFF</color>
     <color name="brown">#9A9C9E</color>

@@ -68,7 +68,7 @@ public class MainDashBoardActivity extends AppCompatActivity {
                 } else if(itemIndex == 1){
                     fragment = new ProfileFragment();
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, fragment)
+                            .replace(R.id.container, fragment, DashBoardFragment.class.getSimpleName())
                             .addToBackStack(DashBoardFragment.class.getSimpleName())
                             .commit();
                 }

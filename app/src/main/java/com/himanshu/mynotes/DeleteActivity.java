@@ -149,7 +149,7 @@ public class DeleteActivity extends AppCompatActivity {
         adapter.notifyItemRemoved(1);
     }
 
-    public void popUpDialogForNote(Notes model) {
+    public void popUpDialogForNote(final Notes model) {
 
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.dialog_delete_note);
