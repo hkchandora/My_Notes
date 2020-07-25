@@ -152,21 +152,21 @@ public class EditNoteActivity extends AppCompatActivity {
             String saveCurrentTime = currentTime.format(calendar.getTime());
             final String editTime = saveCurrentDate + " " + saveCurrentTime;
 
-            if (!NoteTitle.isEmpty()) {
-                try {
-                    NoteTitle = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteTitle);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (!NoteDescription.isEmpty()) {
-                try {
-                    NoteDescription = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteDescription);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+//            if (!NoteTitle.isEmpty()) {
+//                try {
+//                    NoteTitle = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteTitle);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            if (!NoteDescription.isEmpty()) {
+//                try {
+//                    NoteDescription = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteDescription);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
 
             if (fromActivity.equals(DASHBOARD)) {
                 reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -177,13 +177,13 @@ public class EditNoteActivity extends AppCompatActivity {
                         snapshot.getRef().child("lastEditTime").setValue(editTime);
                         snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
                         snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
-                        Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                     }
                 });
+                finish();
             } else if(fromActivity.equals(ARCHIVE)){
                 FirebaseDatabase.getInstance().getReference().child("notes")
                         .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -195,7 +195,6 @@ public class EditNoteActivity extends AppCompatActivity {
                         snapshot.getRef().child("lastEditTime").setValue(editTime);
                         snapshot.getRef().child("tileColor").setValue(noteModel.getTileColor());
                         snapshot.getRef().child("lastEditedTimeStamp").setValue(System.currentTimeMillis());
-                        Toast.makeText(EditNoteActivity.this, "Change Saved", Toast.LENGTH_SHORT).show();
                     }
 
                 @Override
@@ -212,21 +211,21 @@ public class EditNoteActivity extends AppCompatActivity {
             SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
             String saveCurrentDate = currentDate.format(calendar.getTime());
 
-            if (!titleTxt.isEmpty()) {
-                try {
-                    titleTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), titleTxt);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (!descriptionTxt.isEmpty()) {
-                try {
-                    descriptionTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), descriptionTxt);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+//            if (!titleTxt.isEmpty()) {
+//                try {
+//                    titleTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), titleTxt);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            if (!descriptionTxt.isEmpty()) {
+//                try {
+//                    descriptionTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), descriptionTxt);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
 
             noteModel.setNoteTitle(titleTxt);
             noteModel.setNoteId(noteModel.getNoteId());
@@ -238,7 +237,6 @@ public class EditNoteActivity extends AppCompatActivity {
             noteModel.setCreatedTimeStamp(timeStamp);
             noteModel.setLastEditedTimeStamp(timeStamp);
             reference.child(noteModel.getNoteId()).setValue(noteModel);
-            Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
             finish();
         }
     }

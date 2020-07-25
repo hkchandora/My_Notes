@@ -85,23 +85,23 @@ public class DeleteActivity extends AppCompatActivity {
                         holder.Date.setVisibility(View.GONE);
                         holder.deletedDate.setVisibility(View.VISIBLE);
                         holder.deletedDate.setText("Deleted on : "+ model.getDeletedDate());
-                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
-                            try {
-                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
-                                model.setNoteTitle(decryptedText);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
-                            try {
-                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
-                                model.setNoteDesc(decryptedText);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
+//                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+//                            try {
+//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+//                                model.setNoteTitle(decryptedText);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+//                            try {
+//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+//                                model.setNoteDesc(decryptedText);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setVisibility(View.GONE);

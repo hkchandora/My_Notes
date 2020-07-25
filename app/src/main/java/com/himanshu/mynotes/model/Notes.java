@@ -28,8 +28,8 @@ public class Notes implements Parcelable {
         noteDesc = in.readString();
         timeOfCreation = in.readString();
         lastEditTime = in.readString();
-        deletedDate = in.readString();
         tileColor = in.readString();
+        deletedDate = in.readString();
         deletedFrom = in.readString();
         isPinned = in.readByte() != 0;
         createdTimeStamp = in.readLong();
@@ -142,6 +142,7 @@ public class Notes implements Parcelable {
         return super.toString();
     }
 
+
     @Override
     public int describeContents() {
         return 0;
@@ -149,16 +150,16 @@ public class Notes implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-
         parcel.writeString(noteId);
         parcel.writeString(noteTitle);
         parcel.writeString(noteDesc);
         parcel.writeString(timeOfCreation);
         parcel.writeString(lastEditTime);
         parcel.writeString(tileColor);
+        parcel.writeString(deletedDate);
+        parcel.writeString(deletedFrom);
         parcel.writeByte((byte) (isPinned ? 1 : 0));
         parcel.writeLong(createdTimeStamp);
         parcel.writeLong(lastEditedTimeStamp);
     }
-
 }
