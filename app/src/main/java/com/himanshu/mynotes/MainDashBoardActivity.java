@@ -20,7 +20,7 @@ import com.luseen.spacenavigation.SpaceOnClickListener;
 public class MainDashBoardActivity extends AppCompatActivity {
 
     private SpaceNavigationView spaceNavigationView;
-    private Fragment fragment = null;
+    private Fragment fragment = null, currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,8 @@ public class MainDashBoardActivity extends AppCompatActivity {
         spaceNavigationView.addSpaceItem(new SpaceItem("", R.drawable.user_profile_icon));
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container, new DashBoardFragment()).commit();
+
+        currentFragment = getSupportFragmentManager().findFragmentById(R.id.container);
 
         spaceNavigationView.setSpaceOnClickListener(new SpaceOnClickListener() {
             @Override
@@ -49,6 +51,7 @@ public class MainDashBoardActivity extends AppCompatActivity {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, fragment)
                             .commit();
+
                 } else if(itemIndex == 1){
                     fragment = new ProfileFragment();
                     getSupportFragmentManager().beginTransaction()
@@ -60,18 +63,23 @@ public class MainDashBoardActivity extends AppCompatActivity {
 
             @Override
             public void onItemReselected(int itemIndex, String itemName) {
-                if(itemIndex == 0){
-                    fragment = new DashBoardFragment();
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, fragment)
-                            .commit();
-                } else if(itemIndex == 1){
-                    fragment = new ProfileFragment();
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, fragment, DashBoardFragment.class.getSimpleName())
-                            .addToBackStack(DashBoardFragment.class.getSimpleName())
-                            .commit();
-                }
+//                if(currentFragment != new DashBoardFragment()){
+//
+//                }
+//                if(itemIndex == 0){
+//                    fragment = new DashBoardFragment();
+//                    getSupportFragmentManager().beginTransaction()
+//                            .replace(R.id.container, fragment)
+//                            .commit();
+
+
+//                } else if(itemIndex == 1){
+//                    fragment = new ProfileFragment();
+//                    getSupportFragmentManager().beginTransaction()
+//                            .replace(R.id.container, fragment, DashBoardFragment.class.getSimpleName())
+//                            .addToBackStack(DashBoardFragment.class.getSimpleName())
+//                            .commit();
+//                }
             }
         });
     }
