@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,11 +52,15 @@ public class DeleteActivity extends AppCompatActivity {
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
     private String deletedFrom = "";
+    private RelativeLayout noNoteLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delete);
+
+        noNoteLayout = findViewById(R.id.relative_layout4);
+        noNoteLayout.setVisibility(View.GONE);
 
         reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("deletedNotes");
@@ -65,7 +70,27 @@ public class DeleteActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
         checkWhenNoteDeleted();
-        recyclerViewShow();
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    recyclerViewShow();
+                } else {
+                    noNoteLayout.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     public void recyclerViewShow() {

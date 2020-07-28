@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,12 +47,15 @@ public class PinActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private static final int NUM_COLUMNS = 2;
     private DatabaseReference reference;
+    private RelativeLayout noNoteLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pin);
 
+        noNoteLayout = findViewById(R.id.relative_layout2);
+        noNoteLayout.setVisibility(View.GONE);
 
         reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("noteList");
@@ -60,11 +64,61 @@ public class PinActivity extends AppCompatActivity {
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
-        recyclerViewShow();
+        reference.orderByChild("isPinned").equalTo(true).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    int count = 0;
+                    for (DataSnapshot ds : snapshot.getChildren()) {
+                        if (((boolean)ds.child("isPinned").getValue()) == true) {
+                            count++;
+                        }
+                    }
+                    if (count == 0){
+                        noNoteLayout.setVisibility(View.VISIBLE);
+                    } else {
+                        recyclerViewShow();
+                    }
+                } else {
+                    noNoteLayout.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+//        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()) {
+//                    for (DataSnapshot ds : snapshot.getChildren()) {
+//                        int count = 0;
+//                        boolean isPinned = (boolean) ds.child("isPinned").getValue();
+//                        if (isPinned) {
+//                            count++;
+//                            recyclerViewShow();
+//                        }
+////                        else if (count == 0) {
+////                            noNoteLayout.setVisibility(View.VISIBLE);
+////                        }
+//                    }
+//                } else {
+//                    noNoteLayout.setVisibility(View.VISIBLE);
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
     }
 
 
-    public void recyclerViewShow(){
+    public void recyclerViewShow() {
 
         Query query = reference.orderByChild("isPinned").equalTo(true);
 

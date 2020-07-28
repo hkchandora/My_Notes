@@ -95,7 +95,7 @@ public class ProfileFragment extends Fragment {
         ProfileImage = view.findViewById(R.id.profile_image);
         ProfileCardView = view.findViewById(R.id.profile_image_card_view);
 
-        String[] title = {"Pin", "Archive", "Delete", "About", "Log Out"};
+        String[] title = {"Pin", "Archive", "Bin", "About", "Log Out"};
         int[] image = {
                 R.drawable.ic_pushpin,
                 R.drawable.archive_icon,

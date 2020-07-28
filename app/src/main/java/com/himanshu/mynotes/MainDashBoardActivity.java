@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.himanshu.mynotes.fragment.DashBoardFragment;
@@ -46,13 +47,13 @@ public class MainDashBoardActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(int itemIndex, String itemName) {
-                if(itemIndex == 0){
+                if (itemIndex == 0) {
                     fragment = new DashBoardFragment();
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, fragment)
                             .commit();
 
-                } else if(itemIndex == 1){
+                } else if (itemIndex == 1) {
                     fragment = new ProfileFragment();
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.container, fragment)
@@ -63,23 +64,6 @@ public class MainDashBoardActivity extends AppCompatActivity {
 
             @Override
             public void onItemReselected(int itemIndex, String itemName) {
-//                if(currentFragment != new DashBoardFragment()){
-//
-//                }
-//                if(itemIndex == 0){
-//                    fragment = new DashBoardFragment();
-//                    getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.container, fragment)
-//                            .commit();
-
-
-//                } else if(itemIndex == 1){
-//                    fragment = new ProfileFragment();
-//                    getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.container, fragment, DashBoardFragment.class.getSimpleName())
-//                            .addToBackStack(DashBoardFragment.class.getSimpleName())
-//                            .commit();
-//                }
             }
         });
     }

@@ -50,8 +50,36 @@
         android:layout_below="@id/tool_bar5"
         android:orientation="vertical"
         android:padding="5dp"
+        tools:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
         app:spanCount="2"
         tools:listitem="@layout/item_note_grid" />
+
+
+    <RelativeLayout
+        android:id="@+id/relative_layout4"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:layout_below="@id/tool_bar5">
+
+        <ImageView
+            android:id="@+id/archive_icon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_delete"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="No notes in Bin"
+            android:layout_below="@+id/archive_icon"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
+    </RelativeLayout>
 
 </RelativeLayout>
