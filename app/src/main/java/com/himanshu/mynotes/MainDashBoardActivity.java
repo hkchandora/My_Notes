@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -42,7 +43,8 @@ public class MainDashBoardActivity extends AppCompatActivity {
             public void onCentreButtonClick() {
                 Intent i = new Intent(getApplicationContext(), EditNoteActivity.class);
                 i.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_CREATE_NOTE);
-                startActivity(i);
+                Bundle bundle = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.zoom_in, R.anim.static_animation).toBundle();
+                startActivity(i, bundle);
             }
 
             @Override

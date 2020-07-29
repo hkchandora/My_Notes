@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -242,7 +243,11 @@ public class EditNoteActivity extends AppCompatActivity {
                 noteModel.setLastEditedTimeStamp(timeStamp);
                 reference.child(noteModel.getNoteId()).setValue(noteModel);
             }
-            finish();
+            overridePendingTransition(R.anim.static_animation, R.anim.zoom_out);
+//            Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
+//            Bundle bundle = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.static_animation, R.anim.zoom_out).toBundle();
+//            startActivity(intent, bundle);
+//            finish();
         }
     }
 
