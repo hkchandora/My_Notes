@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -135,7 +136,7 @@ public class EditNoteActivity extends AppCompatActivity {
     }
 
     public void backPress(View view) {
-        saveNoteInfo();
+        onBackPressed();
     }
 
     public void saveNoteInfo() {
@@ -248,8 +249,11 @@ public class EditNoteActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     public void onBackPressed() {
+        super.onBackPressed();
         saveNoteInfo();
+        supportFinishAfterTransition();
     }
 
     private OnNoteColorClickListener listener = color -> {
@@ -263,5 +267,15 @@ public class EditNoteActivity extends AppCompatActivity {
         Description.setBackgroundColor(Color.parseColor(color));
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                supportFinishAfterTransition();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
 

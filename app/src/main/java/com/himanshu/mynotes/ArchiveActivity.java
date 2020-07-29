@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -126,10 +128,14 @@ public class ArchiveActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 Intent intent = new Intent(ArchiveActivity.this, EditNoteActivity.class);
+                                Pair[] pairs = new Pair[2];
+                                pairs[0] = new Pair<View, String>(holder.Title, "note_title");
+                                pairs[1] = new Pair<View, String>(holder.Description, "note_description");
+                                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(ArchiveActivity.this, pairs);
                                 intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
                                 intent.putExtra(EditNoteActivity.FROM_ACTIVITY, EditNoteActivity.ARCHIVE);
                                 intent.putExtra(EditNoteActivity.NOTE_DATA, model);
-                                startActivity(intent);
+                                startActivity(intent, options.toBundle());
                             }
                         });
 

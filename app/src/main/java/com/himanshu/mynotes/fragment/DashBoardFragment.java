@@ -1,5 +1,6 @@
 package com.himanshu.mynotes.fragment;
 
+import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.os.Vibrator;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +42,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.himanshu.mynotes.AppsPrefs;
 import com.himanshu.mynotes.EditNoteActivity;
+import com.himanshu.mynotes.EditProfileActivity;
 import com.himanshu.mynotes.FirebaseRepository;
 import com.himanshu.mynotes.MainActivity;
 import com.himanshu.mynotes.R;
@@ -250,11 +253,17 @@ public class DashBoardFragment extends Fragment {
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(requireActivity(), EditNoteActivity.class);
+
+                                Intent intent = new Intent(getActivity(), EditNoteActivity.class);
+                                Pair[] pairs = new Pair[2];
+                                pairs[0] = new Pair<View, String>(holder.Title, "note_title");
+                                pairs[1] = new Pair<View, String>(holder.Description, "note_description");
+                                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(getActivity(), pairs);
                                 intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
                                 intent.putExtra(EditNoteActivity.FROM_ACTIVITY, EditNoteActivity.DASHBOARD);
                                 intent.putExtra(EditNoteActivity.NOTE_DATA, model);
-                                startActivity(intent);
+//                                Bundle bundle = ActivityOptions.makeCustomAnimation(getActivity(), R.anim.zoom_in, R.anim.static_animation).toBundle();
+                                startActivity(intent, options.toBundle());
                             }
                         });
 
