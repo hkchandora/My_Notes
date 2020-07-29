@@ -136,12 +136,12 @@ public class OnBoardingActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences("PREFERENCE", MODE_PRIVATE);
         String FirstTime = preferences.getString("FirstTimeInstall", "");
 
-        if(FirstTime.equals("Yes")){
+        if(FirstTime.equals("No")){
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
         } else {
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("FirstTimeInstall", "Yes");
+            editor.putString("FirstTimeInstall", "No");
             editor.apply();
         }
     }

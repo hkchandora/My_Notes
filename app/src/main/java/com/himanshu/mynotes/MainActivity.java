@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(this, "Something went wrong!! try again", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Something went wrong!! try again", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -124,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
 
                                         }
                                     });
-//                            Toast.makeText(MainActivity.this, "SignIn Success", Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.INVISIBLE);
                             Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
                             startActivity(intent);
@@ -133,9 +132,5 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 });
-    }
-
-    public void signOut(){
-        mGoogleSignInClient.signOut();
     }
 }

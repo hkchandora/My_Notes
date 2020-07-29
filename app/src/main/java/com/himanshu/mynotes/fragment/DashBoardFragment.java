@@ -262,7 +262,6 @@ public class DashBoardFragment extends Fragment {
                                 intent.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_EDIT_NOTE);
                                 intent.putExtra(EditNoteActivity.FROM_ACTIVITY, EditNoteActivity.DASHBOARD);
                                 intent.putExtra(EditNoteActivity.NOTE_DATA, model);
-//                                Bundle bundle = ActivityOptions.makeCustomAnimation(getActivity(), R.anim.zoom_in, R.anim.static_animation).toBundle();
                                 startActivity(intent, options.toBundle());
                             }
                         });
@@ -291,8 +290,6 @@ public class DashBoardFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
         adapter.startListening();
-//        adapter.notifyItemInserted(1);
-//        adapter.notifyItemRemoved(1);
     }
 
     public void popUpDialogForNote(final Notes note) {

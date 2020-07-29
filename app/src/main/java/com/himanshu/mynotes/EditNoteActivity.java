@@ -165,6 +165,7 @@ public class EditNoteActivity extends AppCompatActivity {
 //                    e.printStackTrace();
 //                }
 //            }
+
             if ((!NoteTitle.equals("") && !NoteDescription.equals("")) || (NoteTitle.equals("") && !NoteDescription.equals(""))) {
                 if (fromActivity.equals(DASHBOARD)) {
                     reference.child(noteModel.getNoteId()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -181,7 +182,6 @@ public class EditNoteActivity extends AppCompatActivity {
                         public void onCancelled(@NonNull DatabaseError error) {
                         }
                     });
-//                    onBackPressed();
                 } else if (fromActivity.equals(ARCHIVE)) {
                     FirebaseDatabase.getInstance().getReference().child("notes")
                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -199,7 +199,6 @@ public class EditNoteActivity extends AppCompatActivity {
                         public void onCancelled(@NonNull DatabaseError error) {
                         }
                     });
-//                    onBackPressed();
                 }
             } else if (!NoteTitle.equals("") && NoteDescription.equals("")) {
                 Description.setError("Required");
@@ -244,10 +243,6 @@ public class EditNoteActivity extends AppCompatActivity {
                 reference.child(noteModel.getNoteId()).setValue(noteModel);
             }
             overridePendingTransition(R.anim.static_animation, R.anim.zoom_out);
-//            Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
-//            Bundle bundle = ActivityOptions.makeCustomAnimation(getApplicationContext(), R.anim.static_animation, R.anim.zoom_out).toBundle();
-//            startActivity(intent, bundle);
-//            finish();
         }
     }
 
@@ -263,7 +258,7 @@ public class EditNoteActivity extends AppCompatActivity {
     }
 
     public void backPress(View view) {
-         onBackPressed();
+        onBackPressed();
     }
 
     @Override
