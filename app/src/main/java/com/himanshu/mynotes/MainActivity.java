@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
 
         RelativeLayout signInButton = findViewById(R.id.sign_in_btn);
@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
                             progressBar.setVisibility(View.INVISIBLE);
                             Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
                             startActivity(intent);
+                            finish();
                         } else {
                             Toast.makeText(MainActivity.this, "failed.", Toast.LENGTH_SHORT).show();
                         }

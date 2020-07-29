@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.auth.AuthUI;
@@ -109,7 +110,9 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
                                             if(task.isSuccessful()){
                                                 Intent i4 = new Intent(context, MainActivity.class);
                                                 i4.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                i4.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 context.startActivity(i4);
+                                                ((AppCompatActivity) context).finish();
                                             } else{
                                                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
                                             }
