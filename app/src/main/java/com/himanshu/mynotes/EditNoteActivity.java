@@ -135,9 +135,6 @@ public class EditNoteActivity extends AppCompatActivity {
         ToolBarTitle.setText("Add Note");
     }
 
-    public void backPress(View view) {
-        onBackPressed();
-    }
 
     public void saveNoteInfo() {
         if (type.equals(ACTION_EDIT_NOTE)) {
@@ -183,7 +180,7 @@ public class EditNoteActivity extends AppCompatActivity {
                         public void onCancelled(@NonNull DatabaseError error) {
                         }
                     });
-                    finish();
+//                    onBackPressed();
                 } else if (fromActivity.equals(ARCHIVE)) {
                     FirebaseDatabase.getInstance().getReference().child("notes")
                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
@@ -201,7 +198,7 @@ public class EditNoteActivity extends AppCompatActivity {
                         public void onCancelled(@NonNull DatabaseError error) {
                         }
                     });
-                    finish();
+//                    onBackPressed();
                 }
             } else if (!NoteTitle.equals("") && NoteDescription.equals("")) {
                 Description.setError("Required");
@@ -249,13 +246,6 @@ public class EditNoteActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        saveNoteInfo();
-        supportFinishAfterTransition();
-    }
-
     private OnNoteColorClickListener listener = color -> {
         noteModel.setTileColor(color);
         changeColor(color);
@@ -267,6 +257,16 @@ public class EditNoteActivity extends AppCompatActivity {
         Description.setBackgroundColor(Color.parseColor(color));
     }
 
+    public void backPress(View view) {
+         onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        saveNoteInfo();
+        supportFinishAfterTransition();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
