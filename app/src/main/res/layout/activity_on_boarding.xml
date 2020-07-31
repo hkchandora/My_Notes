@@ -15,6 +15,7 @@
         android:layout_marginBottom="15dp"
         android:background="@drawable/onboard_next_btn"
         android:textAllCaps="true"
+        android:elevation="6dp"
         android:textColor="@color/white"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
