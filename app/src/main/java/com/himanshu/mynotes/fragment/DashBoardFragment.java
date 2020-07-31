@@ -130,7 +130,13 @@ public class DashBoardFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.toString()!=null){
+                if (newText.toString() != null) {
+//                    try {
+//                        Notes notes = new Notes();
+//                        newText = new CryptoUtil().encrypt(notes.getNoteId(), newText);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                     recyclerViewShow(newText.toString());
                 } else {
                     recyclerViewShow("");
@@ -187,10 +193,11 @@ public class DashBoardFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             String name = snapshot.child("name").getValue().toString();
-
                             CurrentUserName.setText("Hello " + name.substring(0, name.indexOf(' ')).trim() + ",\n" + currentTime);
-                            Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
-                                    .placeholder(R.drawable.profilemale).into(ProfileImage);
+                            if (!snapshot.child("photoUrl").getValue().toString().equals("")) {
+                                Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
+                                        .placeholder(R.drawable.profilemale).into(ProfileImage);
+                            }
                         }
                     }
 
@@ -201,10 +208,15 @@ public class DashBoardFragment extends Fragment {
                 });
     }
 
-
     public void recyclerViewShow(String data) {
 
-        Query query = reference.child("noteList").orderByChild("noteDesc").startAt(data).endAt(data+"\uf8ff");
+//        String dataEncrypt = "";
+//        Notes notes = new Notes();
+//
+//        try {
+//            data = new CryptoUtil().encrypt(notes.getNoteId(), data);
+
+        Query query = reference.child("noteList").orderByChild("noteDesc").startAt(data).endAt(data + "\uf8ff");
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
@@ -216,23 +228,23 @@ public class DashBoardFragment extends Fragment {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
-//                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
-//                            try {
-//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
-//                                model.setNoteTitle(decryptedText);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
-//                            try {
-//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
-//                                model.setNoteDesc(decryptedText);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
+                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+                                model.setNoteTitle(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+                                model.setNoteDesc(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
@@ -290,6 +302,9 @@ public class DashBoardFragment extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
         adapter.startListening();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void popUpDialogForNote(final Notes note) {
@@ -348,6 +363,7 @@ public class DashBoardFragment extends Fragment {
                                                         snapshot.child("deletedFrom").getRef().setValue("dashboard");
                                                     }
                                                 }
+
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError error) {
 

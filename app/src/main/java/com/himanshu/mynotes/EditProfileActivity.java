@@ -6,7 +6,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -59,7 +62,44 @@ public class EditProfileActivity extends AppCompatActivity {
         ProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CropImage.startPickImageActivity(EditProfileActivity.this);
+
+                final Dialog dialog = new Dialog(EditProfileActivity.this);
+                dialog.setContentView(R.layout.dialog_profile_click);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                TextView EditProfile = dialog.findViewById(R.id.dialog_edit_profile);
+                TextView RemoveProfile = dialog.findViewById(R.id.dialog_remove_profile);
+
+                EditProfile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        CropImage.startPickImageActivity(EditProfileActivity.this);
+                        dialog.dismiss();
+                    }
+                });
+
+                RemoveProfile.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        reference.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()) {
+                                    snapshot.child("photoUrl").getRef().setValue("");
+                                    ProfileImage.setImageResource(R.drawable.profilemale);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                        dialog.dismiss();
+                    }
+                });
+                dialog.show();
             }
         });
 
@@ -105,8 +145,10 @@ public class EditProfileActivity extends AppCompatActivity {
                     currentUserName = snapshot.child("name").getValue().toString();
                     currentUserEmail = snapshot.child("emailId").getValue().toString();
                     NameTxt.setText(currentUserName);
-                    Picasso.with(EditProfileActivity.this).load(snapshot.child("photoUrl").getValue().toString())
-                            .placeholder(R.drawable.profilemale).into(ProfileImage);
+                    if (!snapshot.child("photoUrl").getValue().toString().equals("")) {
+                        Picasso.with(EditProfileActivity.this).load(snapshot.child("photoUrl").getValue().toString())
+                                .placeholder(R.drawable.profilemale).into(ProfileImage);
+                    }
                 }
             }
 

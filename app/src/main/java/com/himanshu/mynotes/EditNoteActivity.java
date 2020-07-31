@@ -150,21 +150,21 @@ public class EditNoteActivity extends AppCompatActivity {
             String saveCurrentTime = currentTime.format(calendar.getTime());
             final String editTime = saveCurrentDate + " " + saveCurrentTime;
 
-//            if (!NoteTitle.isEmpty()) {
-//                try {
-//                    NoteTitle = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteTitle);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            if (!NoteDescription.isEmpty()) {
-//                try {
-//                    NoteDescription = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteDescription);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
+            if (!NoteTitle.isEmpty()) {
+                try {
+                    NoteTitle = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteTitle);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (!NoteDescription.isEmpty()) {
+                try {
+                    NoteDescription = new CryptoUtil().encrypt(noteModel.getNoteId(), NoteDescription);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
             if ((!NoteTitle.equals("") && !NoteDescription.equals("")) || (NoteTitle.equals("") && !NoteDescription.equals(""))) {
                 if (fromActivity.equals(DASHBOARD)) {
@@ -214,21 +214,21 @@ public class EditNoteActivity extends AppCompatActivity {
             SimpleDateFormat currentDate = new SimpleDateFormat("dd MMM, yyyy");
             String saveCurrentDate = currentDate.format(calendar.getTime());
 
-//            if (!titleTxt.isEmpty()) {
-//                try {
-//                    titleTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), titleTxt);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            if (!descriptionTxt.isEmpty()) {
-//                try {
-//                    descriptionTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), descriptionTxt);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
+            if (!titleTxt.isEmpty()) {
+                try {
+                    titleTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), titleTxt);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (!descriptionTxt.isEmpty()) {
+                try {
+                    descriptionTxt = new CryptoUtil().encrypt(noteModel.getNoteId(), descriptionTxt);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
 
             if ((!titleTxt.equals("") && !descriptionTxt.equals("")) || (titleTxt.equals("") && !descriptionTxt.equals(""))) {
                 noteModel.setNoteTitle(titleTxt);

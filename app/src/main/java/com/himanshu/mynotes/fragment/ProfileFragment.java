@@ -120,12 +120,8 @@ public class ProfileFragment extends Fragment {
                 startActivity(i, options.toBundle());
             }
         });
-
-
         retrieveUserInfo();
-
         return view;
-
     }
 
     private void retrieveUserInfo() {
@@ -139,8 +135,11 @@ public class ProfileFragment extends Fragment {
                 if (snapshot.exists()) {
                     ProfileName.setText(snapshot.child("name").getValue().toString());
                     ProfileEmail.setText(snapshot.child("emailId").getValue().toString());
-                    Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
-                            .placeholder(R.drawable.profilemale).into(ProfileImage);
+                    if (!snapshot.child("photoUrl").getValue().toString().equals("")) {
+                        Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
+                                .placeholder(R.drawable.profilemale).into(ProfileImage);
+                        ProfileImage.setImageResource(R.drawable.profilemale);
+                    }
                 }
             }
 

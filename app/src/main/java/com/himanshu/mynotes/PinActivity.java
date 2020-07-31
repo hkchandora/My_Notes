@@ -89,32 +89,6 @@ public class PinActivity extends AppCompatActivity {
 
             }
         });
-
-//        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.exists()) {
-//                    for (DataSnapshot ds : snapshot.getChildren()) {
-//                        int count = 0;
-//                        boolean isPinned = (boolean) ds.child("isPinned").getValue();
-//                        if (isPinned) {
-//                            count++;
-//                            recyclerViewShow();
-//                        }
-////                        else if (count == 0) {
-////                            noNoteLayout.setVisibility(View.VISIBLE);
-////                        }
-//                    }
-//                } else {
-//                    noNoteLayout.setVisibility(View.VISIBLE);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
     }
 
 
@@ -132,23 +106,23 @@ public class PinActivity extends AppCompatActivity {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
-//                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
-//                            try {
-//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
-//                                model.setNoteTitle(decryptedText);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
-//                            try {
-//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
-//                                model.setNoteDesc(decryptedText);
-//                            } catch (Exception e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
+                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+                                model.setNoteTitle(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+                            try {
+                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+                                model.setNoteDesc(decryptedText);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         holder.Description.setText(model.getNoteDesc());
                         holder.Date.setText(model.getTimeOfCreation());
@@ -183,8 +157,8 @@ public class PinActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
         adapter.startListening();
-        adapter.notifyItemInserted(1);
-        adapter.notifyItemRemoved(1);
+//        adapter.notifyItemInserted(1);
+//        adapter.notifyItemRemoved(1);
     }
 
     public void popUpDialogForNote(Notes model) {
