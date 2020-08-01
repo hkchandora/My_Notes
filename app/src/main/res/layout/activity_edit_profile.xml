@@ -59,8 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            android:src="@drawable/profilemale"
-            tools:ignore="ContentDescription" />
+            android:src="@drawable/profilemale" />
     </androidx.cardview.widget.CardView>
 
     <TextView
@@ -90,6 +89,7 @@
             android:layout_height="50dp"
             android:background="@color/white"
             android:hint="Full Name"
+            android:inputType="text"
             android:padding="5dp"
             android:textStyle="bold"
             android:transitionName="name_transition" />

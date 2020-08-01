@@ -1,5 +1,6 @@
 package com.himanshu.mynotes.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.app.Dialog;
 import android.content.ClipData;
@@ -189,6 +190,7 @@ public class DashBoardFragment extends Fragment {
 
         FirebaseDatabase.getInstance().getReference().child("userDetails").child(auth.getCurrentUser().getUid())
                 .addValueEventListener(new ValueEventListener() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {

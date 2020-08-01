@@ -73,8 +73,8 @@ public class EditProfileActivity extends AppCompatActivity {
                 EditProfile.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        CropImage.startPickImageActivity(EditProfileActivity.this);
                         dialog.dismiss();
+                        CropImage.startPickImageActivity(EditProfileActivity.this);
                     }
                 });
 
@@ -82,12 +82,11 @@ public class EditProfileActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
 
-                        reference.addValueEventListener(new ValueEventListener() {
+                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()) {
-                                    snapshot.child("photoUrl").getRef().setValue("");
-                                    ProfileImage.setImageResource(R.drawable.profilemale);
+                                if(!snapshot.child("photoUrl").getValue().toString().equals("")){
+                                    snapshot.getRef().child("photoUrl").setValue("");
                                 }
                             }
 
@@ -96,6 +95,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
                             }
                         });
+                        ProfileImage.setImageResource(R.drawable.profilemale);
                         dialog.dismiss();
                     }
                 });
