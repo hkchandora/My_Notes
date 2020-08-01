@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -110,6 +111,14 @@ public class EditProfileActivity extends AppCompatActivity {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if(!snapshot.child("photoUrl").getValue().toString().equals("")){
                             snapshot.getRef().child("photoUrl").setValue("");
+
+                            storageProfileReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid() +
+                                    " (" + currentUserEmail + ")").delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(EditProfileActivity.this, "Removed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     }
 
