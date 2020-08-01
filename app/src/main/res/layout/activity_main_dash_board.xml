@@ -19,7 +19,7 @@
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
-        android:elevation="6dp"
+        app:elevation="20dp"
         app:active_item_color="@color/black"
         app:centre_button_color="#90CAF9"
         app:centre_button_icon="@drawable/ic_add_circle"

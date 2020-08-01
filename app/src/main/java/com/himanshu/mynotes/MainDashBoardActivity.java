@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -22,7 +23,9 @@ import com.luseen.spacenavigation.SpaceOnClickListener;
 public class MainDashBoardActivity extends AppCompatActivity {
 
     private SpaceNavigationView spaceNavigationView;
-    private Fragment fragment = null, currentFragment;
+    private Fragment profileFragment;
+    private Fragment dashboardFragment;
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,8 @@ public class MainDashBoardActivity extends AppCompatActivity {
 
         getSupportFragmentManager().beginTransaction().replace(R.id.container, new DashBoardFragment()).commit();
 
-        currentFragment = getSupportFragmentManager().findFragmentById(R.id.container);
+        dashboardFragment = new DashBoardFragment();
+        profileFragment = new ProfileFragment();
 
         spaceNavigationView.setSpaceOnClickListener(new SpaceOnClickListener() {
             @Override
@@ -50,16 +54,16 @@ public class MainDashBoardActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int itemIndex, String itemName) {
                 if (itemIndex == 0) {
-                    fragment = new DashBoardFragment();
+                    currentFragment = dashboardFragment;
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, fragment)
+                            .replace(R.id.container, dashboardFragment)
+//                            .addToBackStack(DashBoardFragment.class.getSimpleName())
                             .commit();
-
                 } else if (itemIndex == 1) {
-                    fragment = new ProfileFragment();
+                    currentFragment = profileFragment;
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.container, fragment)
-                            .addToBackStack(DashBoardFragment.class.getSimpleName())
+                            .replace(R.id.container, profileFragment)
+//                            .addToBackStack(DashBoardFragment.class.getSimpleName())
                             .commit();
                 }
             }
@@ -68,6 +72,24 @@ public class MainDashBoardActivity extends AppCompatActivity {
             public void onItemReselected(int itemIndex, String itemName) {
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentFragment instanceof DashBoardFragment) {
+            finish();
+            return;
+        }
+        if(currentFragment instanceof ProfileFragment){
+            currentFragment = dashboardFragment;
+            spaceNavigationView.changeCurrentItem(0);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, dashboardFragment)
+//                            .addToBackStack(DashBoardFragment.class.getSimpleName())
+                    .commit();
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override

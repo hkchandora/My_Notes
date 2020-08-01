@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseListOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -58,6 +59,7 @@ import com.squareup.picasso.Picasso;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 public class DashBoardFragment extends Fragment {
@@ -131,14 +133,14 @@ public class DashBoardFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.toString() != null) {
+                if (newText != null) {
 //                    try {
 //                        Notes notes = new Notes();
 //                        newText = new CryptoUtil().encrypt(notes.getNoteId(), newText);
 //                    } catch (Exception e) {
 //                        e.printStackTrace();
 //                    }
-                    recyclerViewShow(newText.toString());
+                    recyclerViewShow(newText);
                 } else {
                     recyclerViewShow("");
                 }
@@ -218,35 +220,37 @@ public class DashBoardFragment extends Fragment {
 //        try {
 //            data = new CryptoUtil().encrypt(notes.getNoteId(), data);
 
-        Query query = reference.child("noteList").orderByChild("noteDesc").startAt(data).endAt(data + "\uf8ff");
+//        Query query = reference.child("noteList")
+//                .orderByChild("noteDesc")
+//                .startAt(data.toUpperCase())
+//                .endAt(data.toLowerCase() + "\uf8ff");
 
         FirebaseRecyclerOptions<Notes> options =
                 new FirebaseRecyclerOptions.Builder<Notes>()
-                        .setQuery(query, Notes.class)
+                        .setQuery(reference.child("noteList"), Notes.class)
                         .build();
-
         final FirebaseRecyclerAdapter<Notes, NoteViewHolder> adapter =
                 new FirebaseRecyclerAdapter<Notes, NoteViewHolder>(options) {
                     @Override
                     protected void onBindViewHolder(@NonNull final NoteViewHolder holder, final int position, @NonNull final Notes model) {
 
-                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
-                            try {
-                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
-                                model.setNoteTitle(decryptedText);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
-                            try {
-                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
-                                model.setNoteDesc(decryptedText);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
+//                        if (model.getNoteTitle() != null && !model.getNoteTitle().isEmpty()) {
+//                            try {
+//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteTitle());
+//                                model.setNoteTitle(decryptedText);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                        if (model.getNoteDesc() != null && !model.getNoteDesc().isEmpty()) {
+//                            try {
+//                                String decryptedText = new CryptoUtil().decrypt(model.getNoteId(), model.getNoteDesc());
+//                                model.setNoteDesc(decryptedText);
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
 
                         if (model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.GONE);
@@ -305,6 +309,7 @@ public class DashBoardFragment extends Fragment {
                         return new NoteViewHolder(view);
                     }
                 };
+
 
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
