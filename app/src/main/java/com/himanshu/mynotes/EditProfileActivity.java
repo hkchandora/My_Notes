@@ -63,47 +63,66 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                final Dialog dialog = new Dialog(EditProfileActivity.this);
-                dialog.setContentView(R.layout.dialog_profile_click);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                TextView EditProfile = dialog.findViewById(R.id.dialog_edit_profile);
-                TextView RemoveProfile = dialog.findViewById(R.id.dialog_remove_profile);
-
-                EditProfile.setOnClickListener(new View.OnClickListener() {
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                        CropImage.startPickImageActivity(EditProfileActivity.this);
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.child("photoUrl").getValue().toString().equals("")){
+                            CropImage.startPickImageActivity(EditProfileActivity.this);
+                        } else {
+                            changeProfileImageDialog();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
                     }
                 });
-
-                RemoveProfile.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(!snapshot.child("photoUrl").getValue().toString().equals("")){
-                                    snapshot.getRef().child("photoUrl").setValue("");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                        ProfileImage.setImageResource(R.drawable.profilemale);
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
             }
         });
 
         retrieveUserData();
+    }
+
+    private void changeProfileImageDialog() {
+
+        final Dialog dialog = new Dialog(EditProfileActivity.this);
+        dialog.setContentView(R.layout.dialog_profile_click);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        TextView EditProfile = dialog.findViewById(R.id.dialog_edit_profile);
+        TextView RemoveProfile = dialog.findViewById(R.id.dialog_remove_profile);
+
+        EditProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                CropImage.startPickImageActivity(EditProfileActivity.this);
+            }
+        });
+
+        RemoveProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(!snapshot.child("photoUrl").getValue().toString().equals("")){
+                            snapshot.getRef().child("photoUrl").setValue("");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                ProfileImage.setImageResource(R.drawable.profilemale);
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
