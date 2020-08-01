@@ -248,21 +248,26 @@ public class DashBoardFragment extends Fragment {
                             }
                         }
 
-                        holder.Description.setText(model.getNoteDesc());
-                        holder.Date.setText(model.getTimeOfCreation());
-                        holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
                         if (model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.GONE);
                         } else if (!model.getNoteTitle().equals("")) {
                             holder.Title.setVisibility(View.VISIBLE);
                             holder.Title.setText(model.getNoteTitle());
                         }
-
+                        if (model.getNoteDesc().equals("")) {
+                            holder.Description.setVisibility(View.GONE);
+                        } else if (!model.getNoteDesc().equals("")) {
+                            holder.Description.setVisibility(View.VISIBLE);
+                            holder.Description.setText(model.getNoteDesc());
+                        }
                         if (model.getIsPinned()) {
                             holder.Pin.setVisibility(View.VISIBLE);
                         } else if (!model.getIsPinned()) {
                             holder.Pin.setVisibility(View.INVISIBLE);
                         }
+                        holder.Date.setText(model.getTimeOfCreation());
+                        holder.cardView.setCardBackgroundColor(Color.parseColor(model.getTileColor()));
+
 
                         holder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
