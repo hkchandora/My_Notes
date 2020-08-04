@@ -17,18 +17,18 @@ public class SplashScreen extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash_screen);
 
         progressBar = findViewById(R.id.splash_bar);
 
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            progressBar.setVisibility(View.VISIBLE);
+//            progressBar.setVisibility(View.VISIBLE);
             Thread thread = new Thread() {
                 @Override
                 public void run() {
                     try {
-                        sleep(500);
+                        sleep(150);
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {
@@ -43,7 +43,7 @@ public class SplashScreen extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
-                        sleep(2500);
+                        sleep(400);
                     } catch (Exception e) {
                         e.printStackTrace();
                     } finally {

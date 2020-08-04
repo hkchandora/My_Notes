@@ -60,6 +60,10 @@ public class OnBoardingActivity extends AppCompatActivity {
                 } else {
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     finish();
+                    SharedPreferences preferences = getSharedPreferences("PREFERENCE", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("FirstTimeInstall", "No");
+                    editor.apply();
                 }
             }
         });
@@ -70,19 +74,19 @@ public class OnBoardingActivity extends AppCompatActivity {
         List<OnBoardingItem> onBoardingItems = new ArrayList<>();
 
         OnBoardingItem itemPayOnline = new OnBoardingItem();
-        itemPayOnline.setTitle("Pay Your Bill Online");
-        itemPayOnline.setDescription("Electric bill payment is a feature of online, mobile and telegram banking.");
-        itemPayOnline.setImage(R.drawable.add_note_photo);
+        itemPayOnline.setTitle("Make Your Own Notes");
+        itemPayOnline.setDescription("Make your own notes and save it to your personal phone.");
+        itemPayOnline.setImage(R.drawable.onboarding1);
 
         OnBoardingItem itemPayOnline2 = new OnBoardingItem();
-        itemPayOnline2.setTitle("Pay Your Bill Online");
-        itemPayOnline2.setDescription("Electric bill payment is a feature of online, mobile and telegram banking.");
-        itemPayOnline2.setImage(R.drawable.add_note);
+        itemPayOnline2.setTitle("Notes Security");
+        itemPayOnline2.setDescription("Your saved notes are secure and safe, you can save your personal info.");
+        itemPayOnline2.setImage(R.drawable.onboarding4);
 
         OnBoardingItem itemPayOnline3 = new OnBoardingItem();
-        itemPayOnline3.setTitle("Pay Your Bill Online");
-        itemPayOnline3.setDescription("Electric bill payment is a feature of online, mobile and telegram banking.");
-        itemPayOnline3.setImage(R.drawable.profilemale);
+        itemPayOnline3.setTitle("Save Your Personal Notes");
+        itemPayOnline3.setDescription("You can save your personal info, these notes are safe.");
+        itemPayOnline3.setImage(R.drawable.onboarding2);
 
         onBoardingItems.add(itemPayOnline);
         onBoardingItems.add(itemPayOnline2);
@@ -139,10 +143,11 @@ public class OnBoardingActivity extends AppCompatActivity {
         if(FirstTime.equals("No")){
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             finish();
-        } else {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString("FirstTimeInstall", "No");
-            editor.apply();
         }
+//        else {
+//            SharedPreferences.Editor editor = preferences.edit();
+//            editor.putString("FirstTimeInstall", "No");
+//            editor.apply();
+//        }
     }
 }

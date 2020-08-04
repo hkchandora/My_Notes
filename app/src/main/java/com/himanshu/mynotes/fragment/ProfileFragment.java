@@ -58,7 +58,7 @@ public class ProfileFragment extends Fragment {
         String[] title = {"Pin", "Archive", "Bin", "About", "Log Out"};
         int[] image = {
                 R.drawable.ic_pushpin,
-                R.drawable.archive_icon,
+                R.drawable.ic_archive,
                 R.drawable.ic_delete,
                 R.drawable.ic_about,
                 R.drawable.logout};

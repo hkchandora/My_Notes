@@ -13,6 +13,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -37,6 +39,8 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import javax.xml.namespace.NamespaceContext;
+
 public class EditProfileActivity extends AppCompatActivity {
 
     private StorageReference storageProfileReference;
@@ -47,6 +51,7 @@ public class EditProfileActivity extends AppCompatActivity {
     private DatabaseReference reference;
     private String currentUserName = "", currentUserEmail = "", imageStoreUrl = "";
     private StorageTask uploadTask;
+    private int wordCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +65,23 @@ public class EditProfileActivity extends AppCompatActivity {
         ProfileImage = findViewById(R.id.edit_profile_image);
         NameTxt = findViewById(R.id.edit_profile_name);
 
+        NameTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String input = NameTxt.getText().toString().trim().replaceAll("\n", "");
+                String[] wordcount = input.split("\\s");
+                wordCount = wordcount.length;
+            }
+        });
+
         ProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -67,7 +89,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(snapshot.child("photoUrl").getValue().toString().equals("")){
+                        if (snapshot.child("photoUrl").getValue().toString().equals("")) {
                             CropImage.startPickImageActivity(EditProfileActivity.this);
                         } else {
                             changeProfileImageDialog();
@@ -109,7 +131,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 reference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if(!snapshot.child("photoUrl").getValue().toString().equals("")){
+                        if (!snapshot.child("photoUrl").getValue().toString().equals("")) {
                             snapshot.getRef().child("photoUrl").setValue("");
 
                             storageProfileReference.child(FirebaseAuth.getInstance().getCurrentUser().getUid() +
@@ -244,21 +266,24 @@ public class EditProfileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
 
-        final String Name = NameTxt.getText().toString();
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                snapshot.child("name").getRef().setValue(Name);
-            }
+        if (wordCount >= 2) {
+            final String Name = NameTxt.getText().toString();
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    snapshot.child("name").getRef().setValue(Name);
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
-        supportFinishAfterTransition();
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+            super.onBackPressed();
+            supportFinishAfterTransition();
+        } else {
+            NameTxt.setError("More Than 2 word");
+        }
     }
 
     @Override

@@ -61,6 +61,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+
 
 public class DashBoardFragment extends Fragment {
 
@@ -134,12 +136,12 @@ public class DashBoardFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if (newText != null) {
-//                    try {
-//                        Notes notes = new Notes();
-//                        newText = new CryptoUtil().encrypt(notes.getNoteId(), newText);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
+////                    try {
+////                        Notes notes = new Notes();
+////                        newText = new CryptoUtil().encrypt(notes.getNoteId(), newText);
+////                    } catch (Exception e) {
+////                        e.printStackTrace();
+////                    }
                     recyclerViewShow(newText);
                 } else {
                     recyclerViewShow("");
@@ -163,7 +165,8 @@ public class DashBoardFragment extends Fragment {
                         public void onClick(View v) {
                             Intent i = new Intent(getActivity(), EditNoteActivity.class);
                             i.putExtra(EditNoteActivity.ACTION_TYPE, EditNoteActivity.ACTION_CREATE_NOTE);
-                            startActivity(i);
+                            Bundle bundle = ActivityOptions.makeCustomAnimation(getActivity(), R.anim.zoom_in, R.anim.static_animation).toBundle();
+                            startActivity(i, bundle);
                         }
                     });
                 }
