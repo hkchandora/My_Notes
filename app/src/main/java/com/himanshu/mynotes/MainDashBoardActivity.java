@@ -144,6 +144,7 @@ public class MainDashBoardActivity extends AppCompatActivity {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(false);
 
+        TextView dialogMsg = dialog.findViewById(R.id.dialog_update_app_txt);
         Button laterBtn = dialog.findViewById(R.id.dialog_update_app_later_btn);
         Button exitBtn = dialog.findViewById(R.id.dialog_update_app_exit_btn);
         Button updateBtn = dialog.findViewById(R.id.dialog_update_app_update_btn);
@@ -171,7 +172,9 @@ public class MainDashBoardActivity extends AppCompatActivity {
         updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                if (!isMandatory){
+                    dialog.dismiss();
+                }
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW,
                             Uri.parse("market://details?id=" + MainDashBoardActivity.this.getPackageName())));

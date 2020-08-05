@@ -65,22 +65,22 @@ public class EditProfileActivity extends AppCompatActivity {
         ProfileImage = findViewById(R.id.edit_profile_image);
         NameTxt = findViewById(R.id.edit_profile_name);
 
-        NameTxt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String input = NameTxt.getText().toString().trim().replaceAll("\n", "");
-                String[] wordcount = input.split("\\s");
-                wordCount = wordcount.length;
-            }
-        });
+//        NameTxt.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                String input = NameTxt.getText().toString().trim().replaceAll("\n", "");
+//                String[] wordcount = input.split("\\s");
+//                wordCount = wordcount.length;
+//            }
+//        });
 
         ProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -266,9 +266,8 @@ public class EditProfileActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
-        if (wordCount >= 2) {
-            final String Name = NameTxt.getText().toString();
+        final String Name = NameTxt.getText().toString().trim();
+        if (!Name.equals("")) {
             reference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -282,7 +281,7 @@ public class EditProfileActivity extends AppCompatActivity {
             super.onBackPressed();
             supportFinishAfterTransition();
         } else {
-            NameTxt.setError("More Than 2 word");
+            NameTxt.setError("Required");
         }
     }
 

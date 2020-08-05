@@ -25,6 +25,8 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -73,6 +75,7 @@ public class DashBoardFragment extends Fragment {
     private FirebaseAuth auth;
     private ImageView ProfileImage;
     private RecyclerView recyclerView;
+    private LayoutAnimationController animationController = null;
     private TextView CurrentUserName;
     private String currentTime = "";
     private CardView addNoteCard;
@@ -84,6 +87,7 @@ public class DashBoardFragment extends Fragment {
         auth = FirebaseAuth.getInstance();
         reference = FirebaseDatabase.getInstance().getReference().child("notes")
                 .child(auth.getCurrentUser().getUid());
+
     }
 
     @Override
@@ -93,6 +97,7 @@ public class DashBoardFragment extends Fragment {
         checkAnyNoteIsAvailable();
         retrieveCurrentUserInfo();
         fetchColors();
+        recyclerViewShow("");
     }
 
     private void fetchColors() {
@@ -124,7 +129,6 @@ public class DashBoardFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
-        recyclerViewShow("");
 
         searchView = view.findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -200,7 +204,7 @@ public class DashBoardFragment extends Fragment {
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
                             String name = snapshot.child("name").getValue().toString();
-                            CurrentUserName.setText("Hello " + name.substring(0, name.indexOf(' ')).trim() + ",\n" + currentTime);
+                            CurrentUserName.setText("Hello " +name.split(" ")[0]+ ",\n" + currentTime);
                             if (!snapshot.child("photoUrl").getValue().toString().equals("")) {
                                 Picasso.with(ProfileImage.getContext()).load(snapshot.child("photoUrl").getValue().toString())
                                         .placeholder(R.drawable.profilemale).into(ProfileImage);
@@ -314,8 +318,13 @@ public class DashBoardFragment extends Fragment {
                 };
 
 
+        animationController = AnimationUtils.loadLayoutAnimation(recyclerView.getContext(), R.anim.recyclervirw_anim_layout);
+
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
+        recyclerView.setLayoutAnimation(animationController);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
         adapter.startListening();
 //        } catch (Exception e) {
 //            e.printStackTrace();

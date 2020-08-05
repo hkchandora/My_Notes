@@ -76,17 +76,17 @@ public class OnBoardingActivity extends AppCompatActivity {
         OnBoardingItem itemPayOnline = new OnBoardingItem();
         itemPayOnline.setTitle("Make Your Own Notes");
         itemPayOnline.setDescription("Make your own notes and save it to your personal phone.");
-        itemPayOnline.setImage(R.drawable.onboarding1);
+        itemPayOnline.setImage(R.drawable.onboarding_one);
 
         OnBoardingItem itemPayOnline2 = new OnBoardingItem();
         itemPayOnline2.setTitle("Notes Security");
         itemPayOnline2.setDescription("Your saved notes are secure and safe, you can save your personal info.");
-        itemPayOnline2.setImage(R.drawable.onboarding4);
+        itemPayOnline2.setImage(R.drawable.onboarding_three);
 
         OnBoardingItem itemPayOnline3 = new OnBoardingItem();
         itemPayOnline3.setTitle("Save Your Personal Notes");
         itemPayOnline3.setDescription("You can save your personal info, these notes are safe.");
-        itemPayOnline3.setImage(R.drawable.onboarding2);
+        itemPayOnline3.setImage(R.drawable.onboarding_two);
 
         onBoardingItems.add(itemPayOnline);
         onBoardingItems.add(itemPayOnline2);
