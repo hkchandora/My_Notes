@@ -97,7 +97,6 @@ public class DashBoardFragment extends Fragment {
         checkAnyNoteIsAvailable();
         retrieveCurrentUserInfo();
         fetchColors();
-        recyclerViewShow("");
     }
 
     private void fetchColors() {
@@ -129,6 +128,12 @@ public class DashBoardFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(NUM_COLUMNS, LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        recyclerViewShow("");
+
+        animationController = AnimationUtils.loadLayoutAnimation(recyclerView.getContext(), R.anim.recyclervirw_anim_layout);
+        recyclerView.setLayoutAnimation(animationController);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
 
         searchView = view.findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -318,13 +323,9 @@ public class DashBoardFragment extends Fragment {
                 };
 
 
-        animationController = AnimationUtils.loadLayoutAnimation(recyclerView.getContext(), R.anim.recyclervirw_anim_layout);
 
         recyclerView.setAdapter(adapter);
         recyclerView.setItemAnimator(new CustomItemAnimation());
-        recyclerView.setLayoutAnimation(animationController);
-        recyclerView.getAdapter().notifyDataSetChanged();
-        recyclerView.scheduleLayoutAnimation();
         adapter.startListening();
 //        } catch (Exception e) {
 //            e.printStackTrace();
