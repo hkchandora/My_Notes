@@ -55,12 +55,13 @@ public class ProfileFragment extends Fragment {
         ProfileImage = view.findViewById(R.id.profile_image);
         ProfileCardView = view.findViewById(R.id.profile_image_card_view);
 
-        String[] title = {"Pin", "Archive", "Bin", "About", "Log Out"};
+        String[] title = {"Pin", "Archive", "Bin", "About","Share", "Log Out"};
         int[] image = {
                 R.drawable.ic_pushpin,
                 R.drawable.ic_archive,
                 R.drawable.ic_delete,
                 R.drawable.ic_about,
+                R.drawable.ic_share,
                 R.drawable.logout};
         recyclerView = view.findViewById(R.id.profile_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

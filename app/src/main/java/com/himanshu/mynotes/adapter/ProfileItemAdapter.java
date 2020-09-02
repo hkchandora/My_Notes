@@ -91,7 +91,15 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation((Activity) context, pairs);
                     context.startActivity(i3, options.toBundle());
                 } else if (position == 4) {
-
+                    Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                    sharingIntent.setType("text/plain");
+                    String shareBody = "From below link you can download Notes App :-\n\n" +
+                            "https://play.google.com/store/apps/details?id=" + context.getPackageName();
+                    String shareSub = "Notes Creating APP";
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, shareSub);
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+                    context.startActivity(Intent.createChooser(sharingIntent, "Share using"));
+                } else if (position == 5) {
                     Dialog dialog = new Dialog(context);
                     dialog.setContentView(R.layout.dialog_logout);
                     dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -107,13 +115,13 @@ public class ProfileItemAdapter extends RecyclerView.Adapter<ProfileItemAdapter.
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
-                                            if(task.isSuccessful()){
+                                            if (task.isSuccessful()) {
                                                 Intent i4 = new Intent(context, MainActivity.class);
                                                 i4.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                                 i4.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                                 context.startActivity(i4);
                                                 ((AppCompatActivity) context).finish();
-                                            } else{
+                                            } else {
                                                 Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
                                             }
                                         }
