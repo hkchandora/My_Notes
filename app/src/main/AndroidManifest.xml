@@ -22,7 +22,8 @@
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".DashBoardActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".SplashScreen">
+        <activity android:name=".SplashScreen"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
